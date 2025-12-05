@@ -11,9 +11,11 @@ import (
 type LogEvent string
 
 const (
-	ErrorEvent     LogEvent = "error"
-	IngestEvent    LogEvent = "ingest"
-	GetSecretEvent LogEvent = "get-secret"
+	ErrorEvent        LogEvent = "error"
+	IngestEvent       LogEvent = "ingest"
+	GetSecretEvent    LogEvent = "get-secret"
+	LoginSuccessEvent LogEvent = "login-success"
+	LoginFailedEvent  LogEvent = "login-failed"
 )
 
 func (le LogEvent) String() string {
