@@ -3,7 +3,7 @@
 CREATE TABLE IF NOT EXISTS permission (
     id TEXT PRIMARY KEY,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    credential_id TEXT NOT NULL,
+    token_id TEXT NOT NULL,
     secret_key_pattern TEXT NOT NULL
 );
 -- +goose StatementEnd

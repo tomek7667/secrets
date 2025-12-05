@@ -1,0 +1,14 @@
+-- +goose Up
+-- +goose StatementBegin
+CREATE TABLE IF NOT EXISTS token (
+    id TEXT PRIMARY KEY,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    expires_at DATE,
+    token TEXT NOT NULL UNIQUE
+);
+-- +goose StatementEnd
+
+-- +goose Down
+-- +goose StatementBegin
+DROP TABLE token;
+-- +goose StatementEnd

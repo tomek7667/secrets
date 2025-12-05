@@ -1,14 +1,14 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS credential (
+CREATE TABLE IF NOT EXISTS user (
     id TEXT PRIMARY KEY,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    expires_at DATETIME,
-    token TEXT NOT NULL UNIQUE
+    username TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL
 );
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE credential;
+DROP TABLE user;
 -- +goose StatementEnd

@@ -5,15 +5,9 @@
 package sqlc
 
 import (
+	"database/sql"
 	"time"
 )
-
-type Credential struct {
-	ID        string     `db:"id" json:"id"`
-	CreatedAt *time.Time `db:"created_at" json:"created_at"`
-	ExpiresAt *time.Time `db:"expires_at" json:"expires_at"`
-	Token     string     `db:"token" json:"token"`
-}
 
 type Log struct {
 	ID        string     `db:"id" json:"id"`
@@ -34,4 +28,18 @@ type Secret struct {
 	CreatedAt *time.Time `db:"created_at" json:"created_at"`
 	Key       string     `db:"key" json:"key"`
 	Value     string     `db:"value" json:"value"`
+}
+
+type Token struct {
+	ID        string       `db:"id" json:"id"`
+	CreatedAt *time.Time   `db:"created_at" json:"created_at"`
+	ExpiresAt sql.NullTime `db:"expires_at" json:"expires_at"`
+	Token     string       `db:"token" json:"token"`
+}
+
+type User struct {
+	ID        string     `db:"id" json:"id"`
+	CreatedAt *time.Time `db:"created_at" json:"created_at"`
+	Username  string     `db:"username" json:"username"`
+	Password  string     `db:"password" json:"password"`
 }

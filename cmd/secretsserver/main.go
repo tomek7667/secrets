@@ -1,20 +1,36 @@
-// cmd/secretsserver/main.go
 package main
 
 import (
+	"crypto/rand"
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/caarlos0/env/v11"
 	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
-
-	"github.com/tomek7667/secrets/pkg/secrets"
+	"github.com/tomek7667/go-http-helpers/utils"
+	"github.com/tomek7667/secrets/internal/secrets"
 )
 
 type CliOptions struct {
 	Address        string `env:"SECRETS_ADDRESS" envDefault:"127.0.0.1:7770"`
 	DbPath         string `env:"SECRETS_DB_PATH" envDefault:"./secrets.sqlite"`
 	AllowedOrigins string `env:"ALLOWED_ORIGINS"`
+	JwtSecret      string `env:"SECRETS_JWT_SECRET"`
+}
+
+func getJwtSecret() string {
+	var secret string
+	_, err := os.Stat(".jwtsecret")
+	if err == nil || os.IsExist(err) {
+		secret, _ = utils.MustReadFile(".jwtsecret")
+	} else {
+		fmt.Printf("empty jwt secret, creating .jwtsecret\n")
+		secret = rand.Text()
+		_ = os.WriteFile(".jwtsecret", []byte(secret), os.ModeAppend)
+	}
+	return secret
 }
 
 func main() {
@@ -30,11 +46,14 @@ func main() {
 		Use:   "secretsserver",
 		Short: "Run secrets HTTP API server",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// you’ll make server/client infer from CliOptions
+			if opts.JwtSecret == "" {
+				opts.JwtSecret = getJwtSecret()
+			}
 			srv, err := secrets.New(
 				opts.Address,
 				opts.AllowedOrigins,
 				opts.DbPath,
+				opts.JwtSecret,
 			)
 			if err != nil {
 				return err
@@ -48,6 +67,7 @@ func main() {
 	rootCmd.Flags().StringVar(&opts.Address, "address", opts.Address, "listen address")
 	rootCmd.Flags().StringVar(&opts.DbPath, "db-path", opts.DbPath, "path to sqlite db")
 	rootCmd.Flags().StringVar(&opts.AllowedOrigins, "allowed-origins", opts.AllowedOrigins, "comma-separated list of allowed CORS origins")
+	rootCmd.Flags().StringVar(&opts.JwtSecret, "jwt-secret", opts.JwtSecret, "jwt secret used for users session")
 
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(err)

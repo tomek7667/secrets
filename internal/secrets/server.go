@@ -25,9 +25,10 @@ type Server struct {
 	Address        string
 	allowedOrigins []string
 	Router         chi.Router
+	auther         Auther
 }
 
-func New(address, allowedOrigins, dbPath string) (*Server, error) {
+func New(address, allowedOrigins, dbPath, jwtSecret string) (*Server, error) {
 	// db
 	godotenv.Load()
 	c, err := sqlite.New(context.Background(), dbPath)
@@ -47,6 +48,10 @@ func New(address, allowedOrigins, dbPath string) (*Server, error) {
 		allowedOrigins: strings.Split(allowedOrigins, ","),
 		Db:             c,
 		Router:         r,
+		auther: Auther{
+			Db:        c,
+			JwtSecret: jwtSecret,
+		},
 	}
 
 	return server, nil
