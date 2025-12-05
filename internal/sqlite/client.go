@@ -10,7 +10,6 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 
-	"github.com/caarlos0/env/v10"
 	"github.com/tomek7667/secrets/internal/sqlc"
 )
 
@@ -18,16 +17,15 @@ import (
 var noGoose []byte
 
 type Client struct {
-	Path string `env:"SECRETS_DB_PATH" envDefault:"./secrets.sqlite"`
+	Path string
 
 	DB      *sql.DB
 	Queries *sqlc.Queries
 }
 
-func New(ctx context.Context) (*Client, error) {
-	c := &Client{}
-	if err := env.Parse(c); err != nil {
-		return nil, fmt.Errorf("failed to parse env: %w", err)
+func New(ctx context.Context, dbPath string) (*Client, error) {
+	c := &Client{
+		Path: dbPath,
 	}
 	if !c.dbExists() {
 		err := c.writeDb()
@@ -49,7 +47,7 @@ func New(ctx context.Context) (*Client, error) {
 
 func (c *Client) dbExists() bool {
 	_, err := os.Stat(c.Path)
-	return os.IsExist(err)
+	return os.IsExist(err) || err == nil
 }
 
 func (c *Client) writeDb() error {

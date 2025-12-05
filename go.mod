@@ -11,9 +11,10 @@ tool (
 require github.com/joho/godotenv v1.5.1
 
 require (
-	github.com/caarlos0/env/v10 v10.0.0
+	github.com/caarlos0/env/v11 v11.3.1
 	github.com/go-chi/chi v1.5.5
 	github.com/mattn/go-sqlite3 v1.14.32
+	github.com/spf13/cobra v1.9.1
 	github.com/tomek7667/go-http-helpers v1.1.0
 )
 
@@ -69,7 +70,6 @@ require (
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/sethvargo/go-retry v0.3.0 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
-	github.com/spf13/cobra v1.9.1 // indirect
 	github.com/spf13/pflag v1.0.7 // indirect
 	github.com/sqlc-dev/sqlc v1.30.0 // indirect
 	github.com/stoewer/go-strcase v1.2.0 // indirect

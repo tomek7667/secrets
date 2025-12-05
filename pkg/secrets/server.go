@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/caarlos0/env/v10"
 	"github.com/go-chi/chi"
 	"github.com/joho/godotenv"
 	"github.com/tomek7667/go-http-helpers/chii"
@@ -14,24 +13,24 @@ import (
 	"github.com/tomek7667/secrets/internal/sqlite"
 )
 
+type Options struct {
+	Address        string
+	DBPath         string
+	AllowedOrigins string
+}
+
 type Server struct {
 	Db *sqlite.Client
 
-	Address        string `env:"SECRETS_ADDRESS" envDefault:"127.0.0.1:7770"`
-	AllowedOrigins string `env:"ALLOWED_ORIGINS"`
+	Address        string
 	allowedOrigins []string
 	Router         chi.Router
 }
 
-func New() (*Server, error) {
-	server := &Server{}
-	if err := env.Parse(server); err != nil {
-		return nil, fmt.Errorf("failed to parse env: %w", err)
-	}
-
+func New(address, allowedOrigins, dbPath string) (*Server, error) {
 	// db
 	godotenv.Load()
-	c, err := sqlite.New(context.Background())
+	c, err := sqlite.New(context.Background(), dbPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize sqlite: %w", err)
 	}
@@ -43,9 +42,12 @@ func New() (*Server, error) {
 	})
 
 	// init
-	server.Db = c
-	server.Router = r
-	server.allowedOrigins = strings.Split(server.AllowedOrigins, ",")
+	server := &Server{
+		Address:        address,
+		allowedOrigins: strings.Split(allowedOrigins, ","),
+		Db:             c,
+		Router:         r,
+	}
 
 	return server, nil
 }
@@ -53,7 +55,7 @@ func New() (*Server, error) {
 func (s *Server) Serve() {
 	chii.SetupMiddlewares(s.Router, s.allowedOrigins)
 	s.SetupRoutes()
-	fmt.Printf("listening on %s\n", s.Address)
+	fmt.Printf("listening on address '%s'\n", s.Address)
 	chii.PrintRoutes(s.Router)
 	err := http.ListenAndServe(s.Address, s.Router)
 	if err != nil {
