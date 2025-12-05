@@ -19,7 +19,7 @@ type Log struct {
 type Permission struct {
 	ID               string     `db:"id" json:"id"`
 	CreatedAt        *time.Time `db:"created_at" json:"created_at"`
-	CredentialID     string     `db:"credential_id" json:"credential_id"`
+	TokenID          string     `db:"token_id" json:"token_id"`
 	SecretKeyPattern string     `db:"secret_key_pattern" json:"secret_key_pattern"`
 }
 

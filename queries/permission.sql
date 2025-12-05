@@ -1,7 +1,7 @@
 -- name: CreatePermission :one
 INSERT INTO permission (
     id,
-    credential_id,
+    token_id,
     secret_key_pattern
 ) VALUES (
     ?, ?, ?
@@ -11,7 +11,7 @@ RETURNING *;
 -- name: ListPermissionsByCredential :many
 SELECT *
 FROM permission
-WHERE credential_id = ?
+WHERE token_id = ?
 ORDER BY created_at DESC;
 
 -- name: ListPermissions :many

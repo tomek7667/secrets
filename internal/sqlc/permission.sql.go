@@ -12,17 +12,17 @@ import (
 const createPermission = `-- name: CreatePermission :one
 INSERT INTO permission (
     id,
-    credential_id,
+    token_id,
     secret_key_pattern
 ) VALUES (
     ?, ?, ?
 )
-RETURNING id, created_at, credential_id, secret_key_pattern
+RETURNING id, created_at, token_id, secret_key_pattern
 `
 
 type CreatePermissionParams struct {
 	ID               string `db:"id" json:"id"`
-	CredentialID     string `db:"credential_id" json:"credential_id"`
+	TokenID          string `db:"token_id" json:"token_id"`
 	SecretKeyPattern string `db:"secret_key_pattern" json:"secret_key_pattern"`
 }
 
@@ -30,19 +30,19 @@ type CreatePermissionParams struct {
 //
 //	INSERT INTO permission (
 //	    id,
-//	    credential_id,
+//	    token_id,
 //	    secret_key_pattern
 //	) VALUES (
 //	    ?, ?, ?
 //	)
-//	RETURNING id, created_at, credential_id, secret_key_pattern
+//	RETURNING id, created_at, token_id, secret_key_pattern
 func (q *Queries) CreatePermission(ctx context.Context, arg CreatePermissionParams) (Permission, error) {
-	row := q.db.QueryRowContext(ctx, createPermission, arg.ID, arg.CredentialID, arg.SecretKeyPattern)
+	row := q.db.QueryRowContext(ctx, createPermission, arg.ID, arg.TokenID, arg.SecretKeyPattern)
 	var i Permission
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,
-		&i.CredentialID,
+		&i.TokenID,
 		&i.SecretKeyPattern,
 	)
 	return i, err
@@ -63,14 +63,14 @@ func (q *Queries) DeletePermission(ctx context.Context, id string) error {
 }
 
 const listPermissions = `-- name: ListPermissions :many
-SELECT id, created_at, credential_id, secret_key_pattern
+SELECT id, created_at, token_id, secret_key_pattern
 FROM permission
 ORDER BY created_at DESC
 `
 
 // ListPermissions
 //
-//	SELECT id, created_at, credential_id, secret_key_pattern
+//	SELECT id, created_at, token_id, secret_key_pattern
 //	FROM permission
 //	ORDER BY created_at DESC
 func (q *Queries) ListPermissions(ctx context.Context) ([]Permission, error) {
@@ -85,7 +85,7 @@ func (q *Queries) ListPermissions(ctx context.Context) ([]Permission, error) {
 		if err := rows.Scan(
 			&i.ID,
 			&i.CreatedAt,
-			&i.CredentialID,
+			&i.TokenID,
 			&i.SecretKeyPattern,
 		); err != nil {
 			return nil, err
@@ -102,20 +102,20 @@ func (q *Queries) ListPermissions(ctx context.Context) ([]Permission, error) {
 }
 
 const listPermissionsByCredential = `-- name: ListPermissionsByCredential :many
-SELECT id, created_at, credential_id, secret_key_pattern
+SELECT id, created_at, token_id, secret_key_pattern
 FROM permission
-WHERE credential_id = ?
+WHERE token_id = ?
 ORDER BY created_at DESC
 `
 
 // ListPermissionsByCredential
 //
-//	SELECT id, created_at, credential_id, secret_key_pattern
+//	SELECT id, created_at, token_id, secret_key_pattern
 //	FROM permission
-//	WHERE credential_id = ?
+//	WHERE token_id = ?
 //	ORDER BY created_at DESC
-func (q *Queries) ListPermissionsByCredential(ctx context.Context, credentialID string) ([]Permission, error) {
-	rows, err := q.db.QueryContext(ctx, listPermissionsByCredential, credentialID)
+func (q *Queries) ListPermissionsByCredential(ctx context.Context, tokenID string) ([]Permission, error) {
+	rows, err := q.db.QueryContext(ctx, listPermissionsByCredential, tokenID)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +126,7 @@ func (q *Queries) ListPermissionsByCredential(ctx context.Context, credentialID 
 		if err := rows.Scan(
 			&i.ID,
 			&i.CreatedAt,
-			&i.CredentialID,
+			&i.TokenID,
 			&i.SecretKeyPattern,
 		); err != nil {
 			return nil, err
@@ -147,7 +147,7 @@ UPDATE permission
 SET
     secret_key_pattern = ?
 WHERE id = ?
-RETURNING id, created_at, credential_id, secret_key_pattern
+RETURNING id, created_at, token_id, secret_key_pattern
 `
 
 type UpdatePermissionParams struct {
@@ -161,14 +161,14 @@ type UpdatePermissionParams struct {
 //	SET
 //	    secret_key_pattern = ?
 //	WHERE id = ?
-//	RETURNING id, created_at, credential_id, secret_key_pattern
+//	RETURNING id, created_at, token_id, secret_key_pattern
 func (q *Queries) UpdatePermission(ctx context.Context, arg UpdatePermissionParams) (Permission, error) {
 	row := q.db.QueryRowContext(ctx, updatePermission, arg.SecretKeyPattern, arg.ID)
 	var i Permission
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,
-		&i.CredentialID,
+		&i.TokenID,
 		&i.SecretKeyPattern,
 	)
 	return i, err
