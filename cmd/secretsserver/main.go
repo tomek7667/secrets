@@ -19,6 +19,7 @@ type CliOptions struct {
 	DbPath         string `env:"SECRETS_DB_PATH" envDefault:"./secrets.sqlite"`
 	AllowedOrigins string `env:"ALLOWED_ORIGINS"`
 	JwtSecret      string `env:"SECRETS_JWT_SECRET"`
+	AdminPassword  string `env:"SECRETS_ADMIN_PASSWORD"`
 }
 
 func getJwtSecret() string {
@@ -56,6 +57,7 @@ func main() {
 				opts.AllowedOrigins,
 				opts.DbPath,
 				opts.JwtSecret,
+				opts.AdminPassword,
 			)
 			if err != nil {
 				return err
@@ -70,6 +72,7 @@ func main() {
 	rootCmd.Flags().StringVar(&opts.DbPath, "db-path", opts.DbPath, "path to sqlite db")
 	rootCmd.Flags().StringVar(&opts.AllowedOrigins, "allowed-origins", opts.AllowedOrigins, "comma-separated list of allowed CORS origins")
 	rootCmd.Flags().StringVar(&opts.JwtSecret, "jwt-secret", opts.JwtSecret, "jwt secret used for users session")
+	rootCmd.Flags().StringVar(&opts.AdminPassword, "admin-password", opts.AdminPassword, "admin user password (generated randomly if not provided)")
 
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(err)

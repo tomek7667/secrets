@@ -1,0 +1,42 @@
+meta {
+  name: 08 - Create expired token
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{burl}}/api/tokens
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{admin_token}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "token": "EXPIRED_TOKEN_789",
+    "expires_at": "2020-01-01T00:00:00Z"
+  }
+}
+
+script:post-response {
+  if (res.body.data && res.body.data.id) {
+    bru.setEnvVar("expired_token_id", res.body.data.id);
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data.expires_at: eq 2020-01-01T00:00:00Z
+}
+
+tests {
+  test("Expired token should be created", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().data.expires_at).to.equal("2020-01-01T00:00:00Z");
+  });
+}

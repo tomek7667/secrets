@@ -32,7 +32,7 @@ type Server struct {
 	auther         Auther
 }
 
-func New(address, allowedOrigins, dbPath, jwtSecret string) (*Server, error) {
+func New(address, allowedOrigins, dbPath, jwtSecret, adminPassword string) (*Server, error) {
 	ctx := context.Background()
 	// db
 	godotenv.Load()
@@ -60,10 +60,15 @@ func New(address, allowedOrigins, dbPath, jwtSecret string) (*Server, error) {
 	}
 
 	if users, _ := c.Queries.ListUsers(ctx); len(users) == 0 {
+		// Use provided admin password or generate a random one
+		password := adminPassword
+		if password == "" {
+			password = rand.Text()
+		}
 		params := sqlc.CreateUserParams{
 			ID:       utils.CreateUUID(),
 			Username: "admin",
-			Password: rand.Text(),
+			Password: password,
 		}
 		slog.Info("no users found; creating admin user", "params", params)
 		_, err := c.Queries.CreateUser(ctx, params)

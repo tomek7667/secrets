@@ -1,0 +1,41 @@
+meta {
+  name: 06 - Create token with no expiry
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{burl}}/api/tokens
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{admin_token}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "token": "PERMANENT_TOKEN_123"
+  }
+}
+
+script:post-response {
+  if (res.body.data && res.body.data.id) {
+    bru.setEnvVar("permanent_token_id", res.body.data.id);
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data.expires_at: isNull
+}
+
+tests {
+  test("Token with no expiry should be created", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().data.expires_at).to.be.null;
+  });
+}

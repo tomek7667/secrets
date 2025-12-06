@@ -1,0 +1,28 @@
+meta {
+  name: 08 - Cleanup - Delete test user
+  type: http
+  seq: 8
+}
+
+delete {
+  url: {{burl}}/api/users/{{test_user_id}}
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{admin_token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data: isNull
+}
+
+tests {
+  test("User deletion should succeed", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().success).to.equal(true);
+  });
+}
