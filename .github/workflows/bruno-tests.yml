@@ -26,24 +26,24 @@ jobs:
       - name: Install Bruno CLI
         run: npm install -g @usebruno/cli
       
-      - name: Start server and capture admin password
+      - name: Start server with known admin password
         id: start_server
         run: |
-          # Start server in background and capture output (using stdbuf to disable buffering)
-          stdbuf -oL -eL go run cmd/secretsserver/main.go > server.log 2>&1 &
+          # Use a fixed admin password for testing
+          ADMIN_PASSWORD="TestAdminPassword123!"
+          echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> $GITHUB_ENV
+          
+          # Start server in background with the admin password
+          go run cmd/secretsserver/main.go --admin-password "$ADMIN_PASSWORD" > server.log 2>&1 &
           SERVER_PID=$!
           echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
           
-          # Wait for server to be ready and extract admin password
+          # Wait for server to be ready
           echo "Waiting for server to start..."
           for i in {1..30}; do
-            if [ -f server.log ] && grep -q "creating admin user" server.log; then
-              ADMIN_PASSWORD=$(grep "creating admin user" server.log | grep -oP 'Password:\K[A-Z0-9]+' | tail -1)
-              if [ ! -z "$ADMIN_PASSWORD" ]; then
-                echo "Admin password extracted: $ADMIN_PASSWORD"
-                echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> $GITHUB_ENV
-                break
-              fi
+            if curl -s http://127.0.0.1:7770/login > /dev/null 2>&1; then
+              echo "Server is ready!"
+              break
             fi
             echo "Waiting... ($i/30)"
             sleep 1
@@ -57,20 +57,6 @@ jobs:
           fi
           
           echo "Server started successfully with admin password: $ADMIN_PASSWORD"
-      
-      - name: Update Bruno environment files with admin password
-        run: |
-          if [ -z "$ADMIN_PASSWORD" ]; then
-            echo "ERROR: Admin password not found!"
-            exit 1
-          fi
-          
-          # Update all environment files with the actual admin password
-          find bruno/auth_integration_tests bruno/secrets_integration_tests bruno/users_tokens_integration_tests \
-            -path "*/environments/local.bru" \
-            -exec sed -i "s/PLACEHOLDER_ADMIN_PASSWORD/$ADMIN_PASSWORD/g" {} \;
-          
-          echo "Updated all environment files with admin password"
       
       - name: Run Auth Integration Tests
         run: |
