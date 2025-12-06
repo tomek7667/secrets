@@ -7,6 +7,9 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   bruno-tests:
     runs-on: ubuntu-latest
@@ -23,69 +26,66 @@ jobs:
       - name: Install Bruno CLI
         run: npm install -g @usebruno/cli
       
-      - name: Start server in background
+      - name: Start server and capture admin password
+        id: start_server
         run: |
-          go run cmd/secretsserver/main.go &
+          # Start server in background and capture output
+          go run cmd/secretsserver/main.go > server.log 2>&1 &
           SERVER_PID=$!
           echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
           
-          # Wait for server to be ready
+          # Wait for server to be ready and extract admin password
           echo "Waiting for server to start..."
           for i in {1..30}; do
-            if curl -s http://127.0.0.1:7770/login > /dev/null 2>&1; then
-              echo "Server is ready!"
-              break
+            if [ -f server.log ] && grep -q "creating admin user" server.log; then
+              ADMIN_PASSWORD=$(grep "creating admin user" server.log | grep -oP 'Password:\K[A-Z0-9]+' | tail -1)
+              if [ ! -z "$ADMIN_PASSWORD" ]; then
+                echo "Admin password extracted: $ADMIN_PASSWORD"
+                echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> $GITHUB_ENV
+                break
+              fi
             fi
             echo "Waiting... ($i/30)"
             sleep 1
           done
           
-          # Check if server is actually running
+          # Verify server is running
           if ! curl -s http://127.0.0.1:7770/login > /dev/null 2>&1; then
             echo "Server failed to start"
+            cat server.log
             exit 1
           fi
+          
+          echo "Server started successfully with admin password: $ADMIN_PASSWORD"
       
-      - name: Get admin password
-        id: get_password
+      - name: Update Bruno test files with admin password
         run: |
-          # Wait a bit for admin user creation
-          sleep 2
+          if [ -z "$ADMIN_PASSWORD" ]; then
+            echo "ERROR: Admin password not found!"
+            exit 1
+          fi
           
-          # Extract password from server logs or database
-          # For now, we'll use a default password that should be in the environment
-          # In production, you'd want to set this in GitHub secrets
-          echo "Admin user should be created with a random password"
+          # Update all integration test login files with the actual admin password
+          find bruno/auth_integration_tests bruno/secrets_integration_tests bruno/users_tokens_integration_tests \
+            -name "01 - Login as admin.bru" \
+            -exec sed -i "s/\"password\": \"[^\"]*\"/\"password\": \"$ADMIN_PASSWORD\"/g" {} \;
           
-          # Get the password from logs (this is a workaround)
-          # In production, you should handle this more securely
-          cat secrets.sqlite || echo "Database not found"
+          echo "Updated all test files with admin password"
       
       - name: Run Auth Integration Tests
         run: |
           echo "Running auth integration tests..."
-          bru run bruno/auth_integration_tests --env local --output results/auth.json || true
-        continue-on-error: true
+          cd bruno/auth_integration_tests && bru run --env local
       
       - name: Run Secrets Integration Tests  
         run: |
           echo "Running secrets integration tests..."
-          bru run bruno/secrets_integration_tests --env local --output results/secrets.json || true
-        continue-on-error: true
+          cd bruno/secrets_integration_tests && bru run --env local
       
       - name: Run Users & Tokens Integration Tests
         run: |
           echo "Running users & tokens integration tests..."
-          bru run bruno/users_tokens_integration_tests --env local --output results/users_tokens.json || true
-        continue-on-error: true
-      
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: bruno-test-results
-          path: results/
-          retention-days: 30
+          cd bruno/users_tokens_integration_tests && bru run --env local
       
       - name: Stop server
         if: always()
@@ -93,4 +93,6 @@ jobs:
           if [ ! -z "$SERVER_PID" ]; then
             kill $SERVER_PID || true
           fi
+          pkill -f "go run cmd/secretsserver/main.go" || true
           pkill -f "secretsserver" || true
+
