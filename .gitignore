@@ -1,3 +1,5 @@
 db.sqlite
 ./secrets.sqlite
 .env
+.jwtsecret
+secretsserver

@@ -5,4 +5,5 @@ func (s *Server) SetupRoutes() {
 	s.AddUsersRoutes()
 	s.AddSecretsRoutes()
 	s.AddTokensRoutes()
+	s.AddPermissionsRoutes()
 }

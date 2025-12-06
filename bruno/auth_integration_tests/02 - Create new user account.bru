@@ -1,0 +1,44 @@
+meta {
+  name: 02 - Create new user account
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{burl}}/api/users
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{admin_token}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "username": "testuser_auth",
+    "password": "TestPassword123!"
+  }
+}
+
+script:post-response {
+  if (res.body.data && res.body.data.id) {
+    bru.setEnvVar("test_user_id", res.body.data.id);
+    bru.setEnvVar("test_username", res.body.data.username);
+    bru.setEnvVar("test_password", "TestPassword123!");
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data.username: eq testuser_auth
+}
+
+tests {
+  test("User creation should succeed", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().data.username).to.equal("testuser_auth");
+  });
+}

@@ -1,0 +1,26 @@
+meta {
+  name: 15 - Cleanup - Delete Alice
+  type: http
+  seq: 15
+}
+
+delete {
+  url: {{burl}}/api/users/{{alice_id}}
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{admin_token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+}
+
+tests {
+  test("User deletion should succeed", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
