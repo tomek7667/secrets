@@ -58,19 +58,19 @@ jobs:
           
           echo "Server started successfully with admin password: $ADMIN_PASSWORD"
       
-      - name: Update Bruno test files with admin password
+      - name: Update Bruno environment files with admin password
         run: |
           if [ -z "$ADMIN_PASSWORD" ]; then
             echo "ERROR: Admin password not found!"
             exit 1
           fi
           
-          # Update all integration test login files with the actual admin password
+          # Update all environment files with the actual admin password
           find bruno/auth_integration_tests bruno/secrets_integration_tests bruno/users_tokens_integration_tests \
-            -name "01 - Login as admin.bru" \
-            -exec sed -i "s/\"password\": \"[^\"]*\"/\"password\": \"$ADMIN_PASSWORD\"/g" {} \;
+            -path "*/environments/local.bru" \
+            -exec sed -i "s/PLACEHOLDER_ADMIN_PASSWORD/$ADMIN_PASSWORD/g" {} \;
           
-          echo "Updated all test files with admin password"
+          echo "Updated all environment files with admin password"
       
       - name: Run Auth Integration Tests
         run: |
