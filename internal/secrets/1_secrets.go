@@ -94,7 +94,15 @@ func (s *Server) AddSecretsRoutes() {
 		r.Delete("/", func(w http.ResponseWriter, r *http.Request) {
 			user := chii.GetUser[sqlc.User](r)
 			key := r.URL.Query().Get("key")
-			err := s.Db.Queries.DeleteSecret(r.Context(), key)
+
+			_, err := s.Db.Queries.GetSecret(r.Context(), key)
+			if err != nil {
+				s.Log(ErrorEvent, fmt.Sprintf("user %s failed to delete unexisting secret %s: %s", user.ID, key, err.Error()), r)
+				h.ResNotFound(w, "secret")
+				return
+			}
+
+			err = s.Db.Queries.DeleteSecret(r.Context(), key)
 			if err != nil {
 				s.Log(ErrorEvent, fmt.Sprintf("user %s failed to delete secret %s: %s", user.ID, key, err.Error()), r)
 				h.ResErr(w, err)

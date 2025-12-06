@@ -18,8 +18,10 @@ const (
 	DeleteEvent       LogEvent = "delete"
 	GetSecretEvent    LogEvent = "get-secret"
 	UpdateSecretEvent LogEvent = "update-secret"
+	UpdateTokenEvent  LogEvent = "update-token"
 	GetUsersEvent     LogEvent = "get-users"
 	GetSecretsEvent   LogEvent = "get-secrets"
+	GetTokensEvent    LogEvent = "get-tokens"
 	LoginSuccessEvent LogEvent = "login-success"
 	LoginFailedEvent  LogEvent = "login-failed"
 )

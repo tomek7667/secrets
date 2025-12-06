@@ -1,0 +1,28 @@
+meta {
+  name: create token (to-be-deleted)
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{burl}}/api/tokens
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "token": "del",
+    "expires_at":"1999-12-06T14:43:28.044Z"
+  }
+}
+
+script:post-response {
+  if (res.body.data && res.body.data.id) {
+    bru.setEnvVar("to_be_deleted_token_id", res.body.data.id);
+  }
+}

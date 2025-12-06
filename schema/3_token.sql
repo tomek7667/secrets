@@ -3,7 +3,7 @@
 CREATE TABLE IF NOT EXISTS token (
     id TEXT PRIMARY KEY,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    expires_at DATE,
+    expires_at DATETIME,
     token TEXT NOT NULL UNIQUE
 );
 -- +goose StatementEnd

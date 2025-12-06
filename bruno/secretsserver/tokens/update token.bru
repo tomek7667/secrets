@@ -1,0 +1,21 @@
+meta {
+  name: update token
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{burl}}/api/tokens/{{expired_token_id}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "expires_at":"1990-01-01T14:43:28.044Z"
+  }
+}

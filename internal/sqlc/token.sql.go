@@ -7,7 +7,7 @@ package sqlc
 
 import (
 	"context"
-	"database/sql"
+	"time"
 )
 
 const createToken = `-- name: CreateToken :one
@@ -22,9 +22,9 @@ RETURNING id, created_at, expires_at, token
 `
 
 type CreateTokenParams struct {
-	ID        string       `db:"id" json:"id"`
-	Token     string       `db:"token" json:"token"`
-	ExpiresAt sql.NullTime `db:"expires_at" json:"expires_at"`
+	ID        string     `db:"id" json:"id"`
+	Token     string     `db:"token" json:"token"`
+	ExpiresAt *time.Time `db:"expires_at" json:"expires_at"`
 }
 
 // CreateToken
@@ -51,31 +51,31 @@ func (q *Queries) CreateToken(ctx context.Context, arg CreateTokenParams) (Token
 
 const deleteToken = `-- name: DeleteToken :exec
 DELETE FROM token
-WHERE token = ?
+WHERE id = ?
 `
 
 // DeleteToken
 //
 //	DELETE FROM token
-//	WHERE token = ?
-func (q *Queries) DeleteToken(ctx context.Context, token string) error {
-	_, err := q.db.ExecContext(ctx, deleteToken, token)
+//	WHERE id = ?
+func (q *Queries) DeleteToken(ctx context.Context, id string) error {
+	_, err := q.db.ExecContext(ctx, deleteToken, id)
 	return err
 }
 
 const getToken = `-- name: GetToken :one
 SELECT id, created_at, expires_at, token
 FROM token
-WHERE token = ?
+WHERE id = ?
 `
 
 // GetToken
 //
 //	SELECT id, created_at, expires_at, token
 //	FROM token
-//	WHERE token = ?
-func (q *Queries) GetToken(ctx context.Context, token string) (Token, error) {
-	row := q.db.QueryRowContext(ctx, getToken, token)
+//	WHERE id = ?
+func (q *Queries) GetToken(ctx context.Context, id string) (Token, error) {
+	row := q.db.QueryRowContext(ctx, getToken, id)
 	var i Token
 	err := row.Scan(
 		&i.ID,
@@ -134,8 +134,8 @@ RETURNING id, created_at, expires_at, token
 `
 
 type UpdateTokenParams struct {
-	ExpiresAt sql.NullTime `db:"expires_at" json:"expires_at"`
-	ID        string       `db:"id" json:"id"`
+	ExpiresAt *time.Time `db:"expires_at" json:"expires_at"`
+	ID        string     `db:"id" json:"id"`
 }
 
 // UpdateToken

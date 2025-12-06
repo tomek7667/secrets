@@ -5,7 +5,6 @@
 package sqlc
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -33,10 +32,10 @@ type Secret struct {
 }
 
 type Token struct {
-	ID        string       `db:"id" json:"id"`
-	CreatedAt *time.Time   `db:"created_at" json:"created_at"`
-	ExpiresAt sql.NullTime `db:"expires_at" json:"expires_at"`
-	Token     string       `db:"token" json:"token"`
+	ID        string     `db:"id" json:"id"`
+	CreatedAt *time.Time `db:"created_at" json:"created_at"`
+	ExpiresAt *time.Time `db:"expires_at" json:"expires_at"`
+	Token     string     `db:"token" json:"token"`
 }
 
 type User struct {

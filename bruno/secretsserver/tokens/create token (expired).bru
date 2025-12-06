@@ -1,0 +1,28 @@
+meta {
+  name: create token (expired)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{burl}}/api/tokens
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "token": "expired",
+    "expires_at":"1999-12-06T14:43:28.044Z"
+  }
+}
+
+script:post-response {
+  if (res.body.data && res.body.data.id) {
+    bru.setEnvVar("expired_token_id", res.body.data.id);
+  }
+}

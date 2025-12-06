@@ -11,11 +11,11 @@ RETURNING *;
 -- name: GetToken :one
 SELECT *
 FROM token
-WHERE token = ?;
+WHERE id = ?;
 
 -- name: DeleteToken :exec
 DELETE FROM token
-WHERE token = ?;
+WHERE id = ?;
 
 -- name: ListTokens :many
 SELECT *

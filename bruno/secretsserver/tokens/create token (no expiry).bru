@@ -1,0 +1,27 @@
+meta {
+  name: create token (no expiry)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{burl}}/api/tokens
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "token": "AABBCCDD"
+  }
+}
+
+script:post-response {
+  if (res.body.data && res.body.data.id) {
+    bru.setEnvVar("token_id", res.body.data.id);
+  }
+}

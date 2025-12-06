@@ -83,7 +83,14 @@ func (s *Server) AddUsersRoutes() {
 		r.Delete("/{id}", func(w http.ResponseWriter, r *http.Request) {
 			user := chii.GetUser[sqlc.User](r)
 			id := chi.URLParam(r, "id")
-			err := s.Db.Queries.DeleteUser(r.Context(), id)
+			_, err := s.Db.Queries.GetUser(r.Context(), id)
+			if err != nil {
+				s.Log(ErrorEvent, fmt.Sprintf("user %s failed to delete unexisting user %s: %s", user.ID, id, err.Error()), r)
+				h.ResNotFound(w, "user")
+				return
+			}
+
+			err = s.Db.Queries.DeleteUser(r.Context(), id)
 			if err != nil {
 				s.Log(ErrorEvent, fmt.Sprintf("user %s failed to delete user %s: %s", user.ID, id, err.Error()), r)
 				h.ResErr(w, err)

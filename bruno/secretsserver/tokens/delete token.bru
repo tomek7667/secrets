@@ -1,0 +1,15 @@
+meta {
+  name: delete token
+  type: http
+  seq: 8
+}
+
+delete {
+  url: {{burl}}/api/tokens/{{to_be_deleted_token_id}}
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
