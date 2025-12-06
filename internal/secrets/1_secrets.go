@@ -121,7 +121,7 @@ func (s *Server) AddSecretsRoutes() {
 		key := r.URL.Query().Get("key")
 		if strings.HasPrefix(authValue, "Api ") {
 			token, _ := strings.CutPrefix(authValue, "Api ")
-			tkn, err = s.Db.Queries.GetToken(r.Context(), token)
+			tkn, err = s.Db.Queries.GetTokenByToken(r.Context(), token)
 			if err != nil {
 				s.Log(UnauthorizedEvent, fmt.Sprintf("invalid token '%s' provided to get secret '%s': %s", authValue, key, err.Error()), r)
 				h.ResUnauthorized(w)

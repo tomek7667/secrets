@@ -1,0 +1,42 @@
+meta {
+  name: 07 - Create token with future expiry
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{burl}}/api/tokens
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{admin_token}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "token": "FUTURE_TOKEN_456",
+    "expires_at": "2026-12-31T23:59:59Z"
+  }
+}
+
+script:post-response {
+  if (res.body.data && res.body.data.id) {
+    bru.setEnvVar("future_token_id", res.body.data.id);
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data.expires_at: eq 2026-12-31T23:59:59Z
+}
+
+tests {
+  test("Token with future expiry should be created", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().data.expires_at).to.equal("2026-12-31T23:59:59Z");
+  });
+}

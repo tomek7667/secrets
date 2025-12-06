@@ -25,3 +25,45 @@ script:post-response {
     bru.setEnvVar("token_id", res.body.data.id);
   }
 }
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.code: eq 200
+  res.body.data.token: eq AABBCCDD
+  res.body.data.expires_at: isNull
+}
+
+tests {
+  test("should return 200 OK", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("should return success response", function() {
+    expect(res.getBody().success).to.equal(true);
+  });
+  
+  test("should create token with no expiry", function() {
+    expect(res.getBody().data.token).to.equal("AABBCCDD");
+    expect(res.getBody().data.expires_at).to.be.null;
+  });
+}
+
+docs {
+  Example Response:
+  ```json
+  {
+    "code": 200,
+    "data": {
+      "id": "c1e70a60-03e2-47f0-9957-25414863892a",
+      "created_at": "2025-12-06T15:16:32Z",
+      "expires_at": null,
+      "token": "API_TOKEN_123"
+    },
+    "message": "Success",
+    "statusText": "OK",
+    "success": true,
+    "ts": "2025-12-06T15:16:32.505110371Z"
+  }
+  ```
+}

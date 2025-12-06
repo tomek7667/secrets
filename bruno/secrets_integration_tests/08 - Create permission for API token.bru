@@ -1,0 +1,61 @@
+meta {
+  name: 08 - Create permission for API token
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{burl}}/api/permissions
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{admin_token}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "token_id": "{{api_token_id}}",
+    "secret_key_pattern": "arn:aws:*"
+  }
+}
+
+script:post-response {
+  if (res.body.data && res.body.data.id) {
+    bru.setEnvVar("permission_id", res.body.data.id);
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data.secret_key_pattern: eq arn:aws:*
+}
+
+tests {
+  test("Permission creation should succeed", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().data.secret_key_pattern).to.equal("arn:aws:*");
+  });
+}
+
+docs {
+  Example Response:
+  ```json
+  {
+    "code": 200,
+    "data": {
+      "id": "perm123",
+      "created_at": "2025-12-06T15:16:32Z",
+      "token_id": "token_id",
+      "secret_key_pattern": "arn:aws:*"
+    },
+    "message": "Success",
+    "statusText": "OK",
+    "success": true,
+    "ts": "2025-12-06T15:16:32.505110371Z"
+  }
+  ```
+}

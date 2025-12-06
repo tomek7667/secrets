@@ -1,0 +1,35 @@
+meta {
+  name: 04 - List all users
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{burl}}/api/users
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{admin_token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data: isArray
+}
+
+tests {
+  test("Should return at least 3 users (admin, alice, bob)", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().data.length).to.be.at.least(3);
+  });
+  
+  test("Should include admin, alice, and bob", function() {
+    const usernames = res.getBody().data.map(u => u.username);
+    expect(usernames).to.include("admin");
+    expect(usernames).to.include("alice");
+    expect(usernames).to.include("bob");
+  });
+}

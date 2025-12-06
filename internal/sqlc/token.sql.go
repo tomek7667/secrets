@@ -86,6 +86,29 @@ func (q *Queries) GetToken(ctx context.Context, id string) (Token, error) {
 	return i, err
 }
 
+const getTokenByToken = `-- name: GetTokenByToken :one
+SELECT id, created_at, expires_at, token
+FROM token
+WHERE token = ?
+`
+
+// GetTokenByToken
+//
+//	SELECT id, created_at, expires_at, token
+//	FROM token
+//	WHERE token = ?
+func (q *Queries) GetTokenByToken(ctx context.Context, token string) (Token, error) {
+	row := q.db.QueryRowContext(ctx, getTokenByToken, token)
+	var i Token
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.ExpiresAt,
+		&i.Token,
+	)
+	return i, err
+}
+
 const listTokens = `-- name: ListTokens :many
 SELECT id, created_at, expires_at, token
 FROM token

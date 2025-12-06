@@ -1,0 +1,35 @@
+meta {
+  name: 09 - List all tokens
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{burl}}/api/tokens
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{admin_token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data: isArray
+}
+
+tests {
+  test("Should return at least 3 tokens", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().data.length).to.be.at.least(3);
+  });
+  
+  test("Should include all created tokens", function() {
+    const tokens = res.getBody().data.map(t => t.token);
+    expect(tokens).to.include("PERMANENT_TOKEN_123");
+    expect(tokens).to.include("FUTURE_TOKEN_456");
+    expect(tokens).to.include("EXPIRED_TOKEN_789");
+  });
+}

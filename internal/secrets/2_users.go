@@ -36,6 +36,20 @@ func (s *Server) AddUsersRoutes() {
 			h.ResSuccess(w, users)
 		})
 
+		r.Get("/{id}", func(w http.ResponseWriter, r *http.Request) {
+			user := chii.GetUser[sqlc.User](r)
+			id := chi.URLParam(r, "id")
+			fetchedUser, err := s.Db.Queries.GetUser(r.Context(), id)
+			if err != nil {
+				s.Log(ErrorEvent, fmt.Sprintf("user %s failed to get user %s: %s", user.ID, id, err.Error()), r)
+				h.ResNotFound(w, "user")
+				return
+			} else {
+				s.Log(GetUsersEvent, fmt.Sprintf("%s retrieved user %s", user.ID, id), r)
+			}
+			h.ResSuccess(w, fetchedUser)
+		})
+
 		r.Post("/", func(w http.ResponseWriter, r *http.Request) {
 			user := chii.GetUser[sqlc.User](r)
 			dto, err := h.GetDto[CreateUserDto](r)

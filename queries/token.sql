@@ -13,6 +13,11 @@ SELECT *
 FROM token
 WHERE id = ?;
 
+-- name: GetTokenByToken :one
+SELECT *
+FROM token
+WHERE token = ?;
+
 -- name: DeleteToken :exec
 DELETE FROM token
 WHERE id = ?;
