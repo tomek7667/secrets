@@ -29,8 +29,8 @@ jobs:
       - name: Start server and capture admin password
         id: start_server
         run: |
-          # Start server in background and capture output
-          go run cmd/secretsserver/main.go > server.log 2>&1 &
+          # Start server in background and capture output (using stdbuf to disable buffering)
+          stdbuf -oL -eL go run cmd/secretsserver/main.go > server.log 2>&1 &
           SERVER_PID=$!
           echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
           
@@ -91,8 +91,16 @@ jobs:
         if: always()
         run: |
           if [ ! -z "$SERVER_PID" ]; then
-            kill $SERVER_PID || true
+            kill $SERVER_PID 2>/dev/null || true
+            # Wait for the process to die
+            for i in {1..10}; do
+              if ! kill -0 $SERVER_PID 2>/dev/null; then
+                echo "Server stopped successfully"
+                break
+              fi
+              sleep 1
+            done
+            # Force kill if still running
+            kill -9 $SERVER_PID 2>/dev/null || true
           fi
-          pkill -f "go run cmd/secretsserver/main.go" || true
-          pkill -f "secretsserver" || true
 
