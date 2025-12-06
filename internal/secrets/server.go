@@ -2,7 +2,9 @@ package secrets
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"strings"
 
@@ -10,6 +12,8 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/tomek7667/go-http-helpers/chii"
 	"github.com/tomek7667/go-http-helpers/h"
+	"github.com/tomek7667/go-http-helpers/utils"
+	"github.com/tomek7667/secrets/internal/sqlc"
 	"github.com/tomek7667/secrets/internal/sqlite"
 )
 
@@ -29,9 +33,10 @@ type Server struct {
 }
 
 func New(address, allowedOrigins, dbPath, jwtSecret string) (*Server, error) {
+	ctx := context.Background()
 	// db
 	godotenv.Load()
-	c, err := sqlite.New(context.Background(), dbPath)
+	c, err := sqlite.New(ctx, dbPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize sqlite: %w", err)
 	}
@@ -52,6 +57,19 @@ func New(address, allowedOrigins, dbPath, jwtSecret string) (*Server, error) {
 			Db:        c,
 			JwtSecret: jwtSecret,
 		},
+	}
+
+	if users, _ := c.Queries.ListUsers(ctx); len(users) == 0 {
+		params := sqlc.CreateUserParams{
+			ID:       utils.CreateUUID(),
+			Username: "admin",
+			Password: rand.Text(),
+		}
+		slog.Info("no users found; creating admin user", "params", params)
+		_, err := c.Queries.CreateUser(ctx, params)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create the default user: %w", err)
+		}
 	}
 
 	return server, nil

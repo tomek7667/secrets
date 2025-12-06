@@ -10,10 +10,12 @@ import (
 )
 
 type Log struct {
-	ID        string     `db:"id" json:"id"`
-	CreatedAt *time.Time `db:"created_at" json:"created_at"`
-	Event     string     `db:"event" json:"event"`
-	Msg       string     `db:"msg" json:"msg"`
+	ID           string     `db:"id" json:"id"`
+	CreatedAt    *time.Time `db:"created_at" json:"created_at"`
+	Event        string     `db:"event" json:"event"`
+	Msg          string     `db:"msg" json:"msg"`
+	RequestedUrl *string    `db:"requested_url" json:"requested_url"`
+	RemoteAddr   *string    `db:"remote_addr" json:"remote_addr"`
 }
 
 type Permission struct {

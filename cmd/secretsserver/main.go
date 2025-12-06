@@ -10,6 +10,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	"github.com/tomek7667/go-http-helpers/utils"
+	"github.com/tomek7667/go-multi-logger-slog/logger"
 	"github.com/tomek7667/secrets/internal/secrets"
 )
 
@@ -35,6 +36,7 @@ func getJwtSecret() string {
 
 func main() {
 	godotenv.Load()
+	logger.SetLogLevel()
 	var opts CliOptions
 
 	// load defaults from env

@@ -51,7 +51,7 @@ func (c *Client) dbExists() bool {
 }
 
 func (c *Client) writeDb() error {
-	err := os.WriteFile(c.Path, noGoose, os.ModeAppend)
+	err := os.WriteFile(c.Path, noGoose, 0644)
 	if err != nil {
 		return fmt.Errorf("failed to create default db: %w", err)
 	}

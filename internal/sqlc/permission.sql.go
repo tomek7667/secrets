@@ -101,21 +101,21 @@ func (q *Queries) ListPermissions(ctx context.Context) ([]Permission, error) {
 	return items, nil
 }
 
-const listPermissionsByCredential = `-- name: ListPermissionsByCredential :many
+const listPermissionsByTokenId = `-- name: ListPermissionsByTokenId :many
 SELECT id, created_at, token_id, secret_key_pattern
 FROM permission
 WHERE token_id = ?
 ORDER BY created_at DESC
 `
 
-// ListPermissionsByCredential
+// ListPermissionsByTokenId
 //
 //	SELECT id, created_at, token_id, secret_key_pattern
 //	FROM permission
 //	WHERE token_id = ?
 //	ORDER BY created_at DESC
-func (q *Queries) ListPermissionsByCredential(ctx context.Context, tokenID string) ([]Permission, error) {
-	rows, err := q.db.QueryContext(ctx, listPermissionsByCredential, tokenID)
+func (q *Queries) ListPermissionsByTokenId(ctx context.Context, tokenID string) ([]Permission, error) {
+	rows, err := q.db.QueryContext(ctx, listPermissionsByTokenId, tokenID)
 	if err != nil {
 		return nil, err
 	}

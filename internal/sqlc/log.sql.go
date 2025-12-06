@@ -13,17 +13,21 @@ const createLog = `-- name: CreateLog :one
 INSERT INTO log (
     id,
     event,
-    msg
+    msg,
+    requested_url,
+    remote_addr
 ) VALUES (
-    ?, ?, ?
+    ?, ?, ?, ?, ?
 )
-RETURNING id, created_at, event, msg
+RETURNING id, created_at, event, msg, requested_url, remote_addr
 `
 
 type CreateLogParams struct {
-	ID    string `db:"id" json:"id"`
-	Event string `db:"event" json:"event"`
-	Msg   string `db:"msg" json:"msg"`
+	ID           string  `db:"id" json:"id"`
+	Event        string  `db:"event" json:"event"`
+	Msg          string  `db:"msg" json:"msg"`
+	RequestedUrl *string `db:"requested_url" json:"requested_url"`
+	RemoteAddr   *string `db:"remote_addr" json:"remote_addr"`
 }
 
 // CreateLog
@@ -31,19 +35,29 @@ type CreateLogParams struct {
 //	INSERT INTO log (
 //	    id,
 //	    event,
-//	    msg
+//	    msg,
+//	    requested_url,
+//	    remote_addr
 //	) VALUES (
-//	    ?, ?, ?
+//	    ?, ?, ?, ?, ?
 //	)
-//	RETURNING id, created_at, event, msg
+//	RETURNING id, created_at, event, msg, requested_url, remote_addr
 func (q *Queries) CreateLog(ctx context.Context, arg CreateLogParams) (Log, error) {
-	row := q.db.QueryRowContext(ctx, createLog, arg.ID, arg.Event, arg.Msg)
+	row := q.db.QueryRowContext(ctx, createLog,
+		arg.ID,
+		arg.Event,
+		arg.Msg,
+		arg.RequestedUrl,
+		arg.RemoteAddr,
+	)
 	var i Log
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,
 		&i.Event,
 		&i.Msg,
+		&i.RequestedUrl,
+		&i.RemoteAddr,
 	)
 	return i, err
 }
@@ -61,14 +75,14 @@ func (q *Queries) DeleteLogs(ctx context.Context) error {
 }
 
 const listLogs = `-- name: ListLogs :many
-SELECT id, created_at, event, msg
+SELECT id, created_at, event, msg, requested_url, remote_addr
 FROM log
 ORDER BY created_at DESC
 `
 
 // ListLogs
 //
-//	SELECT id, created_at, event, msg
+//	SELECT id, created_at, event, msg, requested_url, remote_addr
 //	FROM log
 //	ORDER BY created_at DESC
 func (q *Queries) ListLogs(ctx context.Context) ([]Log, error) {
@@ -85,6 +99,8 @@ func (q *Queries) ListLogs(ctx context.Context) ([]Log, error) {
 			&i.CreatedAt,
 			&i.Event,
 			&i.Msg,
+			&i.RequestedUrl,
+			&i.RemoteAddr,
 		); err != nil {
 			return nil, err
 		}

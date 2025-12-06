@@ -27,17 +27,17 @@ func (s *Server) PostLogin() {
 				"err", err,
 				"given pass", dto.Password,
 			)
-			s.Log(LoginFailedEvent, fmt.Sprintf("GetUserByUsername for %s with password %s", dto.Username, dto.Password))
+			s.Log(LoginFailedEvent, fmt.Sprintf("GetUserByUsername for %s with password %s", dto.Username, dto.Password), r)
 			h.ResErr(w, fmt.Errorf("invalid username or password"))
 			return
 		}
 		token, err := s.auther.GetToken(&user)
 		if err != nil {
-			s.Log(LoginFailedEvent, fmt.Sprintf("GetToken for %s failed: %s", dto.Username, err.Error()))
+			s.Log(LoginFailedEvent, fmt.Sprintf("GetToken for %s failed: %s", dto.Username, err.Error()), r)
 			h.ResErr(w, err)
 			return
 		}
-		s.Log(LoginSuccessEvent, fmt.Sprintf("%s logged in", user.Username))
+		s.Log(LoginSuccessEvent, fmt.Sprintf("%s logged in", user.Username), r)
 		h.ResSuccess(w, map[string]string{
 			"token": token,
 		})

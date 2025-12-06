@@ -1,0 +1,33 @@
+meta {
+  name: login
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{burl}}/login
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "username": "admin",
+    "password": "VOS4DUDGY375UJDRHRKKBGYCU7"
+  }
+}
+
+script:post-response {
+  if (res.body.data && res.body.data.token) {
+    bru.setEnvVar("token", res.body.data.token);
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -2,9 +2,11 @@
 INSERT INTO log (
     id,
     event,
-    msg
+    msg,
+    requested_url,
+    remote_addr
 ) VALUES (
-    ?, ?, ?
+    ?, ?, ?, ?, ?
 )
 RETURNING *;
 

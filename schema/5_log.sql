@@ -4,7 +4,9 @@ CREATE TABLE IF NOT EXISTS log (
     id TEXT PRIMARY KEY,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     event TEXT NOT NULL,
-    msg TEXT NOT NULL
+    msg TEXT NOT NULL,
+    requested_url TEXT,
+    remote_addr TEXT
 );
 -- +goose StatementEnd
 

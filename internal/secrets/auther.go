@@ -17,7 +17,11 @@ type Auther struct {
 }
 
 func (a Auther) GetUserFromToken(ctx context.Context, token string) (*sqlc.User, error) {
-	user, err := a.Db.Queries.GetUser(ctx, token)
+	usermap, err := utils.JwtVerify(token, a.JwtSecret)
+	if err != nil {
+		return nil, fmt.Errorf("jwt verify failed: %w", err)
+	}
+	user, err := a.Db.Queries.GetUser(ctx, usermap["id"].(string))
 	if err != nil {
 		return nil, fmt.Errorf("get user failed for token '%s': %w", token, err)
 	}

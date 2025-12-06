@@ -8,7 +8,7 @@ INSERT INTO permission (
 )
 RETURNING *;
 
--- name: ListPermissionsByCredential :many
+-- name: ListPermissionsByTokenId :many
 SELECT *
 FROM permission
 WHERE token_id = ?
