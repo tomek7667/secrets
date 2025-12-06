@@ -29,12 +29,8 @@ jobs:
       - name: Start server with known admin password
         id: start_server
         run: |
-          # Use a fixed admin password for testing
-          ADMIN_PASSWORD="TestAdminPassword123!"
-          echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> $GITHUB_ENV
-          
           # Start server in background with the admin password
-          go run cmd/secretsserver/main.go --admin-password "$ADMIN_PASSWORD" > server.log 2>&1 &
+          go run cmd/secretsserver/main.go --admin-password "TestAdminPassword123!" > server.log 2>&1 &
           SERVER_PID=$!
           echo "SERVER_PID=$SERVER_PID" >> $GITHUB_ENV
           
@@ -56,7 +52,7 @@ jobs:
             exit 1
           fi
           
-          echo "Server started successfully with admin password: $ADMIN_PASSWORD"
+          echo "Server started successfully"
       
       - name: Run Auth Integration Tests
         run: |
