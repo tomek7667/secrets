@@ -8,6 +8,11 @@ INSERT INTO permission (
 )
 RETURNING *;
 
+-- name: GetPermission :one
+SELECT *
+FROM permission
+WHERE id = ?;
+
 -- name: ListPermissionsByTokenId :many
 SELECT *
 FROM permission

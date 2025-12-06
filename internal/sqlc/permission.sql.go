@@ -62,6 +62,29 @@ func (q *Queries) DeletePermission(ctx context.Context, id string) error {
 	return err
 }
 
+const getPermission = `-- name: GetPermission :one
+SELECT id, created_at, token_id, secret_key_pattern
+FROM permission
+WHERE id = ?
+`
+
+// GetPermission
+//
+//	SELECT id, created_at, token_id, secret_key_pattern
+//	FROM permission
+//	WHERE id = ?
+func (q *Queries) GetPermission(ctx context.Context, id string) (Permission, error) {
+	row := q.db.QueryRowContext(ctx, getPermission, id)
+	var i Permission
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.TokenID,
+		&i.SecretKeyPattern,
+	)
+	return i, err
+}
+
 const listPermissions = `-- name: ListPermissions :many
 SELECT id, created_at, token_id, secret_key_pattern
 FROM permission
