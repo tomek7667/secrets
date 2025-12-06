@@ -3,3 +3,4 @@ db.sqlite
 .env
 .jwtsecret
 secretsserver
+secrets.sqlite
