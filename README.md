@@ -2,7 +2,7 @@
 
 A modern, self-hosted secrets management solution with a beautiful web UI and REST API. Securely store and manage passwords, API keys, tokens, and other sensitive data with fine-grained access control.
 
-![Login Page](https://github.com/user-attachments/assets/eea69bef-bf15-4274-ab6c-1a33a29eff79)
+![Secrets Dashboard](tmp/new-screenshots/02-secrets-dashboard.png)
 
 ## ✨ Features
 
@@ -18,17 +18,28 @@ A modern, self-hosted secrets management solution with a beautiful web UI and RE
 
 ## 📸 Screenshots
 
-### Dashboard - Secrets Management
-![Secrets Dashboard](https://github.com/user-attachments/assets/d67490ce-c2c1-483e-a87a-e00decf43b9e)
+### Login Page
+![Login](tmp/new-screenshots/01-login.png)
 
-### Secret Created with Actions
-![Secret Created](https://github.com/user-attachments/assets/531fefd2-8c2e-40fe-8863-d862e59aa450)
+### Secrets Dashboard - Realistic Production Data
+Manage secrets for multiple environments (prod, staging, dev) with organized key naming:
+![Secrets Dashboard](tmp/new-screenshots/02-secrets-dashboard.png)
+
+### Secret Value Revealed
+View and copy sensitive values like database connection strings, API keys, and credentials:
+![Secret Revealed](tmp/new-screenshots/03-secret-revealed.png)
 
 ### User Management
-![Users Tab](https://github.com/user-attachments/assets/e26f70f6-d304-435e-8cc6-f3898c65a263)
+Control dashboard access with multiple user accounts for team collaboration:
+![Users Management](tmp/new-screenshots/04-users.png)
 
-### API Tokens
-![Tokens Tab](https://github.com/user-attachments/assets/48b7ce85-6d70-4079-b644-f54349bd479e)
+### API Tokens with Expiration
+Generate tokens for programmatic access with expiration tracking:
+![API Tokens](tmp/new-screenshots/05-tokens.png)
+
+### Fine-Grained Permissions
+Control access to secrets using pattern matching (prod/*, staging/*, dev/*):
+![Permissions](tmp/new-screenshots/06-permissions.png)
 
 ## 🚀 Quick Start
 
