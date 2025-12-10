@@ -1,39 +1,43 @@
-# 🔐 Secrets Manager
+# Secrets Manager
 
 A modern, self-hosted secrets management solution with a beautiful web UI and REST API. Securely store and manage passwords, API keys, tokens, and other sensitive data with fine-grained access control.
 
-## ✨ Features
+## Features
 
-- **🎨 Modern Web UI** - Beautiful, responsive dashboard with dark mode
-- **🔒 Secure Storage** - All secrets are base64-encoded and stored in SQLite
-- **👥 User Management** - Multi-user support with authentication
-- **🎫 API Tokens** - Generate tokens for programmatic access
-- **🛡️ Fine-Grained Permissions** - Pattern-based access control for secrets
-- **🔑 JWT Authentication** - Secure session management
-- **📝 Audit Logging** - Track all operations on secrets and users
-- **🚀 Self-Hosted** - Full control over your sensitive data
-- **📦 Single Binary** - Easy deployment with no external dependencies
+- **Modern Web UI** - Beautiful, responsive dashboard with dark mode
+- **Secure Storage** - All secrets are base64-encoded and stored in SQLite
+- **User Management** - Multi-user support with authentication
+- **API Tokens** - Generate tokens for programmatic access
+- **Fine-Grained Permissions** - Pattern-based access control for secrets
+- **JWT Authentication** - Secure session management
+- **Audit Logging** - Track all operations on secrets and users
+- **Self-Hosted** - Full control over your sensitive data
+- **Single Binary** - Easy deployment with no external dependencies
 
-## 📸 Screenshots
+## Screenshots
 
 ### Dashboard
+
 Manage secrets across multiple environments with organized naming and easy access:
 ![Secrets Dashboard](docs/screenshots/02-secrets-dashboard.png)
 
 ### Pattern-Based Access Control
+
 Fine-grained permissions using patterns like `prod/*`, `staging/*`, `dev/*`:
 ![Permissions](docs/screenshots/06-permissions.png)
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Installation
 
 #### Using Go Install
+
 ```bash
 go install github.com/tomek7667/secrets/cmd/secretsserver@latest
 ```
 
 #### Build from Source
+
 ```bash
 git clone https://github.com/tomek7667/secrets.git
 cd secrets
@@ -53,6 +57,7 @@ secretsserver --address 0.0.0.0:8080 --db-path /var/lib/secrets/db.sqlite
 The server will start on `http://127.0.0.1:7770` by default.
 
 On first run, an admin user is automatically created. The credentials will be logged to the console:
+
 - Username: `admin`
 - Password: (randomly generated or use `--admin-password` flag)
 
@@ -62,17 +67,17 @@ On first run, an admin user is automatically created. The credentials will be lo
 2. Log in with the admin credentials
 3. Start managing your secrets!
 
-## ⚙️ Configuration
+## Configuration
 
 ### Environment Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `SECRETS_ADDRESS` | `127.0.0.1:7770` | Server listen address |
-| `SECRETS_DB_PATH` | `./secrets.sqlite` | Path to SQLite database file |
-| `SECRETS_JWT_SECRET` | (auto-generated) | JWT signing secret |
-| `SECRETS_ADMIN_PASSWORD` | (auto-generated) | Initial admin password |
-| `ALLOWED_ORIGINS` | (none) | Comma-separated CORS origins |
+| Variable                 | Default            | Description                  |
+| ------------------------ | ------------------ | ---------------------------- |
+| `SECRETS_ADDRESS`        | `127.0.0.1:7770`   | Server listen address        |
+| `SECRETS_DB_PATH`        | `./secrets.sqlite` | Path to SQLite database file |
+| `SECRETS_JWT_SECRET`     | (auto-generated)   | JWT signing secret           |
+| `SECRETS_ADMIN_PASSWORD` | (auto-generated)   | Initial admin password       |
+| `ALLOWED_ORIGINS`        | (none)             | Comma-separated CORS origins |
 
 ### Command Line Flags
 
@@ -98,7 +103,7 @@ export ALLOWED_ORIGINS="https://secrets.example.com"
 secretsserver
 ```
 
-## 📚 Usage Guide
+## Usage Guide
 
 ### Managing Secrets
 
@@ -146,11 +151,12 @@ Permissions control which secrets an API token can access using pattern matching
    - `aws/*` - Access all secrets starting with "aws/"
    - `exact-key` - Access only the exact key
 
-## 🔌 API Documentation
+## API Documentation
 
 ### Authentication
 
 #### Login
+
 ```bash
 POST /login
 Content-Type: application/json
@@ -171,12 +177,14 @@ Content-Type: application/json
 ### Secrets API (Requires JWT)
 
 #### List All Secrets
+
 ```bash
 GET /api/secrets
 Authorization: Bearer <jwt-token>
 ```
 
 #### Create Secret
+
 ```bash
 POST /api/secrets
 Authorization: Bearer <jwt-token>
@@ -189,6 +197,7 @@ Content-Type: application/json
 ```
 
 #### Update Secret
+
 ```bash
 PUT /api/secrets?key=my-secret
 Authorization: Bearer <jwt-token>
@@ -200,6 +209,7 @@ Content-Type: application/json
 ```
 
 #### Delete Secret
+
 ```bash
 DELETE /api/secrets?key=my-secret
 Authorization: Bearer <jwt-token>
@@ -301,7 +311,7 @@ DELETE /api/permissions/{id}
 Authorization: Bearer <jwt-token>
 ```
 
-## 🛠️ Development
+## Development
 
 ### Prerequisites
 
@@ -365,7 +375,7 @@ secrets/
 └── README.md
 ```
 
-## 🔍 Pattern Matching
+## Pattern Matching
 
 Permissions use simple wildcard pattern matching:
 
@@ -374,27 +384,25 @@ Permissions use simple wildcard pattern matching:
 - `exact-match` - Matches only the exact string
 
 Examples:
+
 - Pattern `aws/*` matches: `aws/key1`, `aws/prod/db`, `aws/dev/api-key`
 - Pattern `prod/*` matches: `prod/secret`, `prod/api/key`
 - Pattern `github-token` matches: only `github-token`
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit issues and pull requests.
 
-## 📝 License
+## License
 
 This project is open source. Please check the repository for license information.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 Built with:
+
 - [Go](https://golang.org/) - Programming language
 - [Chi](https://github.com/go-chi/chi) - HTTP router
 - [SQLite](https://www.sqlite.org/) - Database
 - [sqlc](https://sqlc.dev/) - SQL code generator
 - [Bruno](https://www.usebruno.com/) - API testing
-
----
-
-Made with ❤️ for secure secrets management
