@@ -79,7 +79,7 @@ func (s *Server) AddSecretsRoutes() {
 			}
 			updatedSecret, err := s.Db.Queries.UpdateSecret(r.Context(), sqlc.UpdateSecretParams{
 				Key:   key,
-				Value: dto.Value,
+				Value: utils.B64Encode(dto.Value),
 			})
 			if err != nil {
 				s.Log(ErrorEvent, fmt.Sprintf("user %s failed to update secret %s: %s", user.ID, key, err.Error()), r)
