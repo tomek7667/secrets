@@ -1,0 +1,69 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Add SSH Go Module Private Key
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-add - <<< "${{ secrets.GO_MODULE_PRIVATE_KEY }}"
+          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
+
+      - name: Setup access for private go modules
+        run: |
+          git config --global url."ssh://git@github.com/".insteadOf https://github.com/
+
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+
+      - name: "Set up Go"
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+          cache-dependency-path: ./go.sum
+
+      - name: "Generate go code"
+        run: go generate ./...
+
+      - name: "Run tests"
+        run: go test ./...
+
+      - name: "Build for Linux"
+        if: success()
+        run: GOOS=linux GOARCH=amd64 go build -o ./secretsserver ./cmd/secretsserver
+
+      - name: "Upload binary to server"
+        if: success()
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          port: ${{ secrets.SSH_PORT }}
+          key: ${{ secrets.SSH_KEY }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          source: ./secretsserver
+          target: ${{ secrets.SSH_DIST_DEST }}
+
+  deploy:
+    runs-on: self-hosted
+
+    needs: test-and-build
+
+    steps:
+      - name: "Restart the daemon with the new binary and env variables"
+        run: |
+          cd ${{ secrets.SSH_DIST_DEST }}
+          ls -al
+          LOG_LEVEL=${{ vars.LOG_LEVEL}} LOKI_ENDPOINT=${{ secrets.LOKI_ENDPOINT }} LOKI_USERNAME=${{ secrets.LOKI_USERNAME }} LOKI_PASSWORD=${{ secrets.LOKI_PASSWORD }} APP_PORT=${{ vars.APP_PORT }} SECRETS_ADDRESS="127.0.0.1:${{ vars.APP_PORT }}" APP_NAME=${{ vars.PM2_NAME }} SECRETS_JWT_SECRET=${{ secrets.SECRETS_JWT_SECRET }} ALLOWED_ORIGINS="${{vars.ALLOWED_ORIGINS}}" pm2 restart ${{ vars.PM2_NAME }} --update-env

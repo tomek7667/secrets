@@ -1,0 +1,42 @@
+name: Update nginx
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "nginx/**"
+      - ".github/workflows/nginx.yml"
+  workflow_dispatch:
+
+jobs:
+  upload:
+    name: Upload nginx config
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+
+      - name: "Upload nginx config"
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          port: ${{ secrets.SSH_PORT }}
+          key: ${{ secrets.SSH_KEY }}
+          source: ./nginx/7017.secrets
+          target: /tmp/7017.secrets
+
+  deploy:
+    name: Restart nginx
+    runs-on: self-hosted
+    needs: upload
+    steps:
+      - name: "Move nginx to the right place"
+        run: |
+          sudo mv /tmp/7017.secrets/nginx/7017.secrets ${{ secrets.NGINX_DIST }}/7017.secrets
+          rm -rf /tmp/7017.secrets
+
+      - name: "Restart nginx"
+        run: |
+          sudo systemctl restart nginx
