@@ -2,8 +2,6 @@
 
 A modern, self-hosted secrets management solution with a beautiful web UI and REST API. Securely store and manage passwords, API keys, tokens, and other sensitive data with fine-grained access control.
 
-![Secrets Dashboard](docs/screenshots/02-secrets-dashboard.png)
-
 ## ✨ Features
 
 - **🎨 Modern Web UI** - Beautiful, responsive dashboard with dark mode
@@ -18,27 +16,12 @@ A modern, self-hosted secrets management solution with a beautiful web UI and RE
 
 ## 📸 Screenshots
 
-### Login Page
-![Login](docs/screenshots/01-login.png)
-
-### Secrets Dashboard - Realistic Production Data
-Manage secrets for multiple environments (prod, staging, dev) with organized key naming:
+### Dashboard
+Manage secrets across multiple environments with organized naming and easy access:
 ![Secrets Dashboard](docs/screenshots/02-secrets-dashboard.png)
 
-### Secret Value Revealed
-View and copy sensitive values like database connection strings, API keys, and credentials:
-![Secret Revealed](docs/screenshots/03-secret-revealed.png)
-
-### User Management
-Control dashboard access with multiple user accounts for team collaboration:
-![Users Management](docs/screenshots/04-users.png)
-
-### API Tokens with Expiration
-Generate tokens for programmatic access with expiration tracking:
-![API Tokens](docs/screenshots/05-tokens.png)
-
-### Fine-Grained Permissions
-Control access to secrets using pattern matching (prod/*, staging/*, dev/*):
+### Pattern-Based Access Control
+Fine-grained permissions using patterns like `prod/*`, `staging/*`, `dev/*`:
 ![Permissions](docs/screenshots/06-permissions.png)
 
 ## 🚀 Quick Start
