@@ -6,11 +6,16 @@ Self-hosted secrets management with web UI and REST API.
 
 ## Features
 
-- Web UI with dark mode
-- SQLite storage (single binary, no dependencies)
-- Multi-user with JWT authentication
-- API tokens with pattern-based permissions
-- Audit logging
+- 🔐 Web UI with dark mode
+- 💾 SQLite storage (single binary, no dependencies)
+- 👥 Multi-user with JWT authentication
+- 🔑 API tokens with pattern-based permissions
+- 📜 Audit logging
+- 🔏 Certificate & Key Management (RSA, ECDSA, ED25519)
+  - Generate key pairs
+  - Import/Export certificates (PEM format)
+  - Create self-signed & CA-signed certificates
+  - Certificate verification & validation
 
 ## Screenshots
 
@@ -109,9 +114,138 @@ Then use `Authorization: Bearer <jwt>` for:
 | POST                | `/api/secrets`      | Create secret      |
 | PUT                 | `/api/secrets?key=` | Update secret      |
 | DELETE              | `/api/secrets?key=` | Delete secret      |
-| GET/POST/PUT/DELETE | `/api/users`        | Manage users       |
-| GET/POST/PUT/DELETE | `/api/tokens`       | Manage tokens      |
-| GET/POST/PUT/DELETE | `/api/permissions`  | Manage permissions |
+| GET/POST/PUT/DELETE | `/api/users`        | Manage users           |
+| GET/POST/PUT/DELETE | `/api/tokens`       | Manage tokens          |
+| GET/POST/PUT/DELETE | `/api/permissions`  | Manage permissions     |
+| GET/POST/DELETE     | `/api/certificates` | Manage certificates    |
+
+## Certificate Management
+
+The secrets manager includes comprehensive certificate and key management capabilities:
+
+### Generate Key Pairs
+
+Generate RSA, ECDSA, or ED25519 key pairs:
+
+```bash
+POST /api/certificates/generate-keypair
+Authorization: Bearer <jwt>
+Content-Type: application/json
+
+{
+  "name": "my-keypair",
+  "algorithm": "RSA",     // "RSA", "ECDSA", or "ED25519"
+  "key_size": 2048        // RSA: 2048, 3072, 4096; ECDSA: 256, 384, 521
+}
+```
+
+### Generate Certificates
+
+Create self-signed or CA-signed X.509 certificates:
+
+```bash
+POST /api/certificates/generate-certificate
+Authorization: Bearer <jwt>
+Content-Type: application/json
+
+{
+  "name": "my-cert",
+  "private_key_name": "my-keypair-private",
+  "subject": {
+    "common_name": "example.com",
+    "organization": "My Organization",
+    "country": "US"
+  },
+  "validity_days": 365,
+  "is_ca": false,
+  "dns_names": ["example.com", "www.example.com"],
+  "signing_cert_name": "ca-cert"  // Optional: for CA-signed certs
+}
+```
+
+### Import/Export Certificates
+
+```bash
+# Import a certificate
+POST /api/certificates/import
+Authorization: Bearer <jwt>
+Content-Type: application/json
+
+{
+  "name": "imported-cert",
+  "cert_type": "certificate",  // "private_key", "public_key", "certificate", "ca_certificate"
+  "pem_data": "-----BEGIN CERTIFICATE-----\n..."
+}
+
+# Export a certificate
+GET /api/certificates/{name}/export
+Authorization: Bearer <jwt>
+```
+
+### Verify Certificates
+
+Verify certificate validity and signatures:
+
+```bash
+POST /api/certificates/verify
+Authorization: Bearer <jwt>
+Content-Type: application/json
+
+{
+  "certificate_name": "my-cert",
+  "ca_cert_name": "ca-cert"  // Optional: verify against specific CA
+}
+```
+
+### Go SDK - Certificate Management
+
+```go
+// Generate RSA key pair
+keyPair, err := client.GenerateKeyPair(secretssdk.GenerateKeyPairRequest{
+    Name:      "my-rsa-key",
+    Algorithm: "RSA",
+    KeySize:   ptrInt(2048),
+})
+
+// Generate self-signed certificate
+cert, err := client.GenerateCertificate(secretssdk.GenerateCertificateRequest{
+    Name:           "my-cert",
+    PrivateKeyName: "my-rsa-key-private",
+    Subject: secretssdk.Subject{
+        CommonName:   "example.com",
+        Organization: "My Org",
+        Country:      "US",
+    },
+    ValidityDays: 365,
+    IsCA:         false,
+    DNSNames:     []string{"example.com", "*.example.com"},
+})
+
+// Verify certificate
+result, err := client.VerifyCertificate(secretssdk.VerifyCertificateRequest{
+    CertificateName: "my-cert",
+})
+
+// Export certificate
+exported, err := client.ExportCertificate("my-cert")
+fmt.Println(exported.PemData)
+```
+
+### List & Manage Certificates
+
+```bash
+# List all certificates
+GET /api/certificates
+Authorization: Bearer <jwt>
+
+# Get specific certificate
+GET /api/certificates/{name}
+Authorization: Bearer <jwt>
+
+# Delete certificate
+DELETE /api/certificates/{name}
+Authorization: Bearer <jwt>
+```
 
 ## Pattern Matching
 
@@ -138,5 +272,9 @@ cd web && yarn dev    # Runs on localhost:5173, proxies API to :7770
 Integration tests (requires [Bruno CLI](https://www.usebruno.com/)):
 
 ```bash
+# Run all test collections
 cd bruno/auth_integration_tests && bru run --env local
+cd bruno/secrets_integration_tests && bru run --env local
+cd bruno/users_tokens_integration_tests && bru run --env local
+cd bruno/certificates_integration_tests && bru run --env local
 ```

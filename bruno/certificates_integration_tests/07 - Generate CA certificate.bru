@@ -1,0 +1,42 @@
+meta {
+  name: 07 - Generate CA key pair
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{burl}}/api/certificates/generate-keypair
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{admin_token}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "test-ca",
+    "algorithm": "RSA",
+    "key_size": 2048
+  }
+}
+
+script:post-response {
+  if (res.body.data && res.body.data.private_key) {
+    bru.setEnvVar("ca_private_key_name", res.body.data.private_key.name);
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data.private_key.name: eq test-ca-private
+}
+
+tests {
+  test("CA key pair generation should succeed", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
