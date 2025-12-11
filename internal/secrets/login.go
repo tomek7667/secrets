@@ -14,7 +14,7 @@ type GetLoginDto struct {
 }
 
 func (s *Server) PostLogin() {
-	s.Router.Post("/login", func(w http.ResponseWriter, r *http.Request) {
+	s.Router.With(withRateLimit(s.loginLimiter)).Post("/login", func(w http.ResponseWriter, r *http.Request) {
 		dto, err := h.GetDto[GetLoginDto](r)
 		if err != nil {
 			h.ResBadRequest(w, err)

@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/joho/godotenv"
@@ -30,6 +31,7 @@ type Server struct {
 	allowedOrigins []string
 	Router         chi.Router
 	auther         Auther
+	loginLimiter   *rateLimiter
 }
 
 func New(address, allowedOrigins, dbPath, jwtSecret, adminPassword string) (*Server, error) {
@@ -57,6 +59,7 @@ func New(address, allowedOrigins, dbPath, jwtSecret, adminPassword string) (*Ser
 			Db:        c,
 			JwtSecret: jwtSecret,
 		},
+		loginLimiter: newRateLimiter(5, time.Minute),
 	}
 
 	if users, _ := c.Queries.ListUsers(ctx); len(users) == 0 {
