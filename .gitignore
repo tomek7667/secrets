@@ -4,3 +4,4 @@ secrets.sqlite
 .jwtsecret
 secretsserver
 server.log
+tmp/
