@@ -32,6 +32,9 @@ Self-hosted secrets management with web UI and REST API.
 ![Permissions Panel](docs/screenshots/06-permissions-panel.png)
 *Permission configuration for tokens*
 
+![Login with Cloudflare Turnstile](docs/screenshots/07-login-with-captcha.png)
+*Login page with Cloudflare Turnstile captcha enabled*
+
 ## Installation
 
 ```bash
