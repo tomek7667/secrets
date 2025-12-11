@@ -14,8 +14,23 @@ Self-hosted secrets management with web UI and REST API.
 
 ## Screenshots
 
+![Login](docs/screenshots/01-login.png)
+*Clean login interface with dark mode*
+
 ![Secrets Dashboard](docs/screenshots/02-secrets-dashboard.png)
-![Permissions](docs/screenshots/06-permissions.png)
+*Main dashboard showing secrets management*
+
+![Secret Revealed](docs/screenshots/03-secret-revealed.png)
+*Viewing a secret value with one click*
+
+![Users Panel](docs/screenshots/04-users-panel.png)
+*User management interface*
+
+![Tokens Panel](docs/screenshots/05-tokens-panel.png)
+*API token management*
+
+![Permissions Panel](docs/screenshots/06-permissions-panel.png)
+*Permission configuration for tokens*
 
 ## Installation
 
