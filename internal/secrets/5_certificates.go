@@ -25,7 +25,7 @@ import (
 type GenerateKeyPairDto struct {
 	Name      string `json:"name"`
 	Algorithm string `json:"algorithm"` // "RSA", "ECDSA", "ED25519"
-	KeySize   *int   `json:"key_size"`  // For RSA: 2048, 3072, 4096; For ECDSA: 256, 384, 521
+	KeySize   *int64 `json:"key_size"`  // For RSA: 2048, 3072, 4096; For ECDSA: 256, 384, 521
 }
 
 type ImportCertificateDto struct {
@@ -391,14 +391,14 @@ func (s *Server) AddCertificatesRoutes() {
 
 // Helper functions
 
-func generateKeyPair(algorithm string, keySize *int) (privateKeyPEM, publicKeyPEM, algo string, size int64, err error) {
+func generateKeyPair(algorithm string, keySize *int64) (privateKeyPEM, publicKeyPEM, algo string, size int64, err error) {
 	switch algorithm {
 	case "RSA":
-		size := 2048
+		rsaSize := int64(2048)
 		if keySize != nil {
-			size = *keySize
+			rsaSize = *keySize
 		}
-		privateKey, err := rsa.GenerateKey(rand.Reader, size)
+		privateKey, err := rsa.GenerateKey(rand.Reader, int(rsaSize))
 		if err != nil {
 			return "", "", "", 0, err
 		}
@@ -416,15 +416,15 @@ func generateKeyPair(algorithm string, keySize *int) (privateKeyPEM, publicKeyPE
 			Type:  "PUBLIC KEY",
 			Bytes: publicKeyBytes,
 		}))
-		return privateKeyPEM, publicKeyPEM, "RSA", int64(size), nil
+		return privateKeyPEM, publicKeyPEM, "RSA", rsaSize, nil
 
 	case "ECDSA":
 		var curve elliptic.Curve
-		size := 256
+		ecdsaSize := int64(256)
 		if keySize != nil {
-			size = *keySize
+			ecdsaSize = *keySize
 		}
-		switch size {
+		switch ecdsaSize {
 		case 256:
 			curve = elliptic.P256()
 		case 384:
@@ -432,7 +432,7 @@ func generateKeyPair(algorithm string, keySize *int) (privateKeyPEM, publicKeyPE
 		case 521:
 			curve = elliptic.P521()
 		default:
-			return "", "", "", 0, fmt.Errorf("unsupported ECDSA key size: %d", size)
+			return "", "", "", 0, fmt.Errorf("unsupported ECDSA key size: %d", ecdsaSize)
 		}
 
 		privateKey, err := ecdsa.GenerateKey(curve, rand.Reader)
@@ -456,7 +456,7 @@ func generateKeyPair(algorithm string, keySize *int) (privateKeyPEM, publicKeyPE
 			Type:  "PUBLIC KEY",
 			Bytes: publicKeyBytes,
 		}))
-		return privateKeyPEM, publicKeyPEM, "ECDSA", int64(size), nil
+		return privateKeyPEM, publicKeyPEM, "ECDSA", ecdsaSize, nil
 
 	case "ED25519":
 		publicKey, privateKey, err := ed25519.GenerateKey(rand.Reader)
