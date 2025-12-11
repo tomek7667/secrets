@@ -1,6 +1,7 @@
 package secretssdk
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -19,22 +20,29 @@ type secretResponse struct {
 	Data    Secret `json:"data"`
 }
 
-func (c *Client) GetSecret(key string) (*Secret, error) {
+func (c *Client) GetSecretWithCtx(key string, ctx context.Context) (*Secret, error) {
 	endpoint := fmt.Sprintf("%s/api/secrets/get?key=%s", c.BaseUrl, url.QueryEscape(key))
-
-	resp, err := c.GetHttpClient().Get(endpoint)
+	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create a new request for endpoint '%s': %w", endpoint, err)
+	}
+	req = req.WithContext(ctx)
+	resp, err := c.GetHttpClient().Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("request failed for secret '%s': %w", key, err)
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode == http.StatusUnauthorized {
+		return nil, fmt.Errorf("unauthorized: token lacks permission for secret '%s'", key)
+	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("failed to get secret: status %d", resp.StatusCode)
+		return nil, fmt.Errorf("unexpected status %d for secret '%s'", resp.StatusCode, key)
 	}
 
 	var result secretResponse
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to decode response for secret '%s': %w", key, err)
 	}
 
 	decoded, err := base64.StdEncoding.DecodeString(result.Data.Value)
@@ -44,4 +52,8 @@ func (c *Client) GetSecret(key string) (*Secret, error) {
 	result.Data.Value = string(decoded)
 
 	return &result.Data, nil
+}
+
+func (c *Client) GetSecret(key string) (*Secret, error) {
+	return c.GetSecretWithCtx(key, context.Background())
 }
