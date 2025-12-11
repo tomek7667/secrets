@@ -66,4 +66,4 @@ jobs:
         run: |
           cd ${{ secrets.SSH_DIST_DEST }}
           ls -al
-          LOG_LEVEL=${{ vars.LOG_LEVEL}} LOKI_ENDPOINT=${{ secrets.LOKI_ENDPOINT }} LOKI_USERNAME=${{ secrets.LOKI_USERNAME }} LOKI_PASSWORD=${{ secrets.LOKI_PASSWORD }} APP_PORT=${{ vars.APP_PORT }} SECRETS_ADDRESS="127.0.0.1:${{ vars.APP_PORT }}" APP_NAME=${{ vars.PM2_NAME }} SECRETS_JWT_SECRET=${{ secrets.SECRETS_JWT_SECRET }} ALLOWED_ORIGINS="${{vars.ALLOWED_ORIGINS}}" pm2 restart ${{ vars.PM2_NAME }} --update-env
+          LOG_LEVEL=${{ vars.LOG_LEVEL}} LOKI_ENDPOINT=${{ secrets.LOKI_ENDPOINT }} LOKI_USERNAME=${{ secrets.LOKI_USERNAME }} LOKI_PASSWORD=${{ secrets.LOKI_PASSWORD }} APP_PORT=${{ vars.APP_PORT }} SECRETS_ADDRESS="127.0.0.1:${{ vars.APP_PORT }}" APP_NAME=${{ vars.PM2_NAME }} SECRETS_JWT_SECRET=${{ secrets.SECRETS_JWT_SECRET }} ALLOWED_ORIGINS="${{vars.ALLOWED_ORIGINS}}" TURNSTILE_SECRET="${{ secrets.TURNSTILE_SECRET }}" TURNSTILE_SITE_KEY="${{ secrets.TURNSTILE_SITE_KEY }}" pm2 restart ${{ vars.PM2_NAME }} --update-env

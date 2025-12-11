@@ -9,8 +9,9 @@ import (
 )
 
 type GetLoginDto struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username     string `json:"username"`
+	Password     string `json:"password"`
+	CaptchaToken string `json:"captchaToken"`
 }
 
 func (s *Server) PostLogin() {
@@ -20,6 +21,12 @@ func (s *Server) PostLogin() {
 			h.ResBadRequest(w, err)
 			return
 		}
+		err = s.verifyCaptcha(r.Context(), dto.CaptchaToken)
+		if err != nil {
+			h.ResBadRequest(w, err)
+			return
+		}
+
 		user, err := s.Db.Queries.GetUserByUsername(r.Context(), dto.Username)
 		if err != nil || user.Password != dto.Password {
 			slog.Warn(

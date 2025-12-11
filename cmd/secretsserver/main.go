@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"log"
+	"log/slog"
 	"os"
 
 	"github.com/caarlos0/env/v11"
@@ -15,11 +16,13 @@ import (
 )
 
 type CliOptions struct {
-	Address        string `env:"SECRETS_ADDRESS" envDefault:"127.0.0.1:7770"`
-	DbPath         string `env:"SECRETS_DB_PATH" envDefault:"./secrets.sqlite"`
-	AllowedOrigins string `env:"ALLOWED_ORIGINS"`
-	JwtSecret      string `env:"SECRETS_JWT_SECRET"`
-	AdminPassword  string `env:"SECRETS_ADMIN_PASSWORD"`
+	Address          string `env:"SECRETS_ADDRESS" envDefault:"127.0.0.1:7770"`
+	DbPath           string `env:"SECRETS_DB_PATH" envDefault:"./secrets.sqlite"`
+	AllowedOrigins   string `env:"ALLOWED_ORIGINS"`
+	JwtSecret        string `env:"SECRETS_JWT_SECRET"`
+	AdminPassword    string `env:"SECRETS_ADMIN_PASSWORD"`
+	TurnstileSecret  string `env:"TURNSTILE_SECRET"`
+	TurnstileSiteKey string `env:"TURNSTILE_SITE_KEY"`
 }
 
 func getJwtSecret() string {
@@ -52,12 +55,17 @@ func main() {
 			if opts.JwtSecret == "" {
 				opts.JwtSecret = getJwtSecret()
 			}
+			if opts.TurnstileSecret == "" {
+				slog.Warn("turnstile secret is empty, so captcha on login will be disabled")
+			}
 			srv, err := secrets.New(
 				opts.Address,
 				opts.AllowedOrigins,
 				opts.DbPath,
 				opts.JwtSecret,
 				opts.AdminPassword,
+				opts.TurnstileSecret,
+				opts.TurnstileSiteKey,
 			)
 			if err != nil {
 				return err
@@ -73,6 +81,8 @@ func main() {
 	rootCmd.Flags().StringVar(&opts.AllowedOrigins, "allowed-origins", opts.AllowedOrigins, "comma-separated list of allowed CORS origins")
 	rootCmd.Flags().StringVar(&opts.JwtSecret, "jwt-secret", opts.JwtSecret, "jwt secret used for users session")
 	rootCmd.Flags().StringVar(&opts.AdminPassword, "admin-password", opts.AdminPassword, "admin user password (generated randomly if not provided)")
+	rootCmd.Flags().StringVar(&opts.TurnstileSecret, "turnstile-secret", opts.TurnstileSecret, "turnstile secret for captcha on login page (if not provided, logged and disabled)")
+	rootCmd.Flags().StringVar(&opts.TurnstileSiteKey, "turnstile-site-key", opts.TurnstileSiteKey, "turnstile site key for captcha on login page (if not provided, logged and disabled)")
 
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(err)

@@ -27,14 +27,16 @@ type Options struct {
 type Server struct {
 	Db *sqlite.Client
 
-	Address        string
-	allowedOrigins []string
-	Router         chi.Router
-	auther         Auther
-	loginLimiter   *rateLimiter
+	turnstileSecret  string
+	turnstileSiteKey string
+	Address          string
+	allowedOrigins   []string
+	Router           chi.Router
+	auther           Auther
+	loginLimiter     *rateLimiter
 }
 
-func New(address, allowedOrigins, dbPath, jwtSecret, adminPassword string) (*Server, error) {
+func New(address, allowedOrigins, dbPath, jwtSecret, adminPassword, turnstileSecret, turnstileSiteKey string) (*Server, error) {
 	ctx := context.Background()
 	// db
 	godotenv.Load()
@@ -51,10 +53,12 @@ func New(address, allowedOrigins, dbPath, jwtSecret, adminPassword string) (*Ser
 
 	// init
 	server := &Server{
-		Address:        address,
-		allowedOrigins: strings.Split(allowedOrigins, ","),
-		Db:             c,
-		Router:         r,
+		Address:          address,
+		allowedOrigins:   strings.Split(allowedOrigins, ","),
+		Db:               c,
+		Router:           r,
+		turnstileSecret:  turnstileSecret,
+		turnstileSiteKey: turnstileSiteKey,
 		auther: Auther{
 			Db:        c,
 			JwtSecret: jwtSecret,
