@@ -262,7 +262,10 @@ func (s *Server) AddCertificatesRoutes() {
 					return
 				}
 
-				// Get CA private key (assume it's named <ca_cert_name>-private)
+				// Get CA private key
+				// NOTE: This assumes the CA's private key follows the naming convention: {ca_cert_name}-private
+				// For example, if the CA certificate is named "my-ca", its private key must be named "my-ca-private"
+				// This is automatically handled when using the generate-keypair endpoint, which creates keys with -private suffix
 				caPrivateKeyName := *dto.SigningCertName + "-private"
 				caPrivateKeyCert, err := s.Db.Queries.GetCertificate(r.Context(), caPrivateKeyName)
 				if err != nil {

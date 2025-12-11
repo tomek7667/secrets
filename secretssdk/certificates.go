@@ -21,7 +21,7 @@ type Certificate struct {
 type GenerateKeyPairRequest struct {
 	Name      string `json:"name"`
 	Algorithm string `json:"algorithm"` // "RSA", "ECDSA", "ED25519"
-	KeySize   *int   `json:"key_size"`
+	KeySize   *int64 `json:"key_size"`
 }
 
 type GenerateKeyPairResponse struct {
