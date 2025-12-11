@@ -1,0 +1,46 @@
+meta {
+  name: 03 - Generate ECDSA key pair
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{burl}}/api/certificates/generate-keypair
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{admin_token}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "test-ecdsa",
+    "algorithm": "ECDSA",
+    "key_size": 256
+  }
+}
+
+script:post-response {
+  if (res.body.data && res.body.data.private_key) {
+    bru.setEnvVar("ecdsa_private_key_name", res.body.data.private_key.name);
+    bru.setEnvVar("ecdsa_public_key_name", res.body.data.public_key.name);
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data.private_key.name: eq test-ecdsa-private
+  res.body.data.public_key.name: eq test-ecdsa-public
+  res.body.data.private_key.algorithm: eq ECDSA
+}
+
+tests {
+  test("ECDSA key pair generation should succeed", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().data.private_key.pem_data).to.contain("EC PRIVATE KEY");
+  });
+}

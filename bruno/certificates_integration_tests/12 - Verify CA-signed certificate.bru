@@ -1,0 +1,37 @@
+meta {
+  name: 12 - Verify CA-signed certificate
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{burl}}/api/certificates/verify
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{admin_token}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "certificate_name": "test-ca-signed-cert",
+    "ca_cert_name": "test-ca-cert"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data.valid: eq true
+}
+
+tests {
+  test("CA-signed certificate verification should succeed", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().data.valid).to.be.true;
+    expect(res.getBody().data.subject).to.contain("signed.example.com");
+  });
+}
