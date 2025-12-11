@@ -13,18 +13,9 @@ docs/
     ├── 03-secret-revealed.png    # Secret value revealed
     ├── 04-users-panel.png        # User management panel
     ├── 05-tokens-panel.png       # API token management panel
-    └── 06-permissions-panel.png  # Permission configuration panel
+    ├── 06-permissions-panel.png  # Permission configuration panel
+    └── 07-login-with-captcha.png # Login with Cloudflare Turnstile captcha
 ```
-
-## Cloudflare Turnstile Support
-
-The application supports Cloudflare Turnstile captcha on the login page. To enable it, start the server with:
-
-```bash
-secretsserver --turnstile-secret "your-secret" --turnstile-site-key "your-site-key"
-```
-
-The captcha widget will automatically appear on the login form when configured.
 
 ## Screenshots
 
