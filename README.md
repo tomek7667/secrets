@@ -32,8 +32,7 @@ Self-hosted secrets management with web UI and REST API.
 ![Permissions Panel](docs/screenshots/06-permissions-panel.png)
 *Permission configuration for tokens*
 
-![Login with Cloudflare Turnstile](docs/screenshots/07-login-with-captcha.png)
-*Login page with Cloudflare Turnstile captcha enabled*
+> **Note**: Cloudflare Turnstile captcha integration is supported on the login page when configured with `--turnstile-secret` and `--turnstile-site-key` flags. The captcha widget cannot be captured in automated screenshots due to environment restrictions.
 
 ## Installation
 
