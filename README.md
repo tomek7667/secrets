@@ -1,3 +1,5 @@
+[![Bruno Integration Tests](https://github.com/tomek7667/secrets/actions/workflows/bruno-tests.yml/badge.svg)](https://github.com/tomek7667/secrets/actions/workflows/bruno-tests.yml)
+
 # Secrets Manager
 
 Self-hosted secrets management with web UI and REST API.
