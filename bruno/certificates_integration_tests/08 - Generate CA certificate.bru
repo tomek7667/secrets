@@ -1,0 +1,51 @@
+meta {
+  name: 08 - Generate CA certificate
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{burl}}/api/certificates/generate-certificate
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{admin_token}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "test-ca-cert",
+    "private_key_name": "test-ca-private",
+    "subject": {
+      "common_name": "Test CA",
+      "organization": "Test CA Organization",
+      "country": "US"
+    },
+    "validity_days": 3650,
+    "is_ca": true
+  }
+}
+
+script:post-response {
+  if (res.body.data && res.body.data.name) {
+    bru.setEnvVar("ca_cert_name", res.body.data.name);
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data.name: eq test-ca-cert
+  res.body.data.cert_type: eq ca_certificate
+}
+
+tests {
+  test("CA certificate generation should succeed", function() {
+    expect(res.getStatus()).to.equal(200);
+    const metadata = JSON.parse(res.getBody().data.metadata);
+    expect(metadata.is_ca).to.be.true;
+  });
+}
