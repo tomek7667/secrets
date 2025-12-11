@@ -73,6 +73,11 @@ jobs:
           echo "Running users & tokens integration tests..."
           cd bruno/users_tokens_integration_tests && bru run --env local
       
+      - name: Run Certificates Integration Tests
+        run: |
+          echo "Running certificates integration tests..."
+          cd bruno/certificates_integration_tests && bru run --env local
+      
       - name: Stop server
         if: always()
         run: |

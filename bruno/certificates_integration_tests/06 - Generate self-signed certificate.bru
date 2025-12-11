@@ -1,0 +1,53 @@
+meta {
+  name: 06 - Generate self-signed certificate
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{burl}}/api/certificates/generate-certificate
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{admin_token}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "test-self-signed-cert",
+    "private_key_name": "test-rsa-private",
+    "subject": {
+      "common_name": "test.example.com",
+      "organization": "Test Organization",
+      "country": "US"
+    },
+    "validity_days": 365,
+    "is_ca": false,
+    "dns_names": ["test.example.com", "www.test.example.com"]
+  }
+}
+
+script:post-response {
+  if (res.body.data && res.body.data.name) {
+    bru.setEnvVar("self_signed_cert_name", res.body.data.name);
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data.name: eq test-self-signed-cert
+  res.body.data.cert_type: eq certificate
+}
+
+tests {
+  test("Self-signed certificate generation should succeed", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().data.pem_data).to.contain("CERTIFICATE");
+    const metadata = JSON.parse(res.getBody().data.metadata);
+    expect(metadata.subject).to.contain("test.example.com");
+  });
+}
