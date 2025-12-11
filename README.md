@@ -28,8 +28,11 @@ Or build from source:
 ```bash
 git clone https://github.com/tomek7667/secrets.git
 cd secrets
+go generate ./...          # Builds frontend + runs migrations
 go build ./cmd/secretsserver
 ```
+
+> **Note:** Building requires Node.js and Yarn for the frontend.
 
 ## Usage
 
@@ -122,7 +125,14 @@ Permissions use wildcard patterns:
 
 ```bash
 go mod download
+cd web && yarn install && yarn build && cd ..
 go run cmd/secretsserver/main.go --admin-password "dev123"
+```
+
+Frontend development (with hot reload):
+
+```bash
+cd web && yarn dev    # Runs on localhost:5173, proxies API to :7770
 ```
 
 Integration tests (requires [Bruno CLI](https://www.usebruno.com/)):

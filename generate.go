@@ -1,3 +1,5 @@
+//go:generate yarn --cwd web install
+//go:generate yarn --cwd web build
 //go:generate go run github.com/sqlc-dev/sqlc/cmd/sqlc generate
 //go:generate go run github.com/pressly/goose/v3/cmd/goose -v -dir schema sqlite3 ./internal/sqlite/secrets.sqlite up
 package generate
