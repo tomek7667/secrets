@@ -159,4 +159,46 @@ func (s *Server) AddSecretsRoutes() {
 		s.Log(GetSecretEvent, fmt.Sprintf("token %s", tkn.ID), r)
 		h.ResSuccess(w, secret)
 	})
+
+	s.Router.Get("/api/secrets/list", func(w http.ResponseWriter, r *http.Request) {
+		var err error
+		var tkn sqlc.Token
+		authValue := strings.TrimSpace(r.Header.Get("Authorization"))
+		if strings.HasPrefix(authValue, "Api ") {
+			token, _ := strings.CutPrefix(authValue, "Api ")
+			tkn, err = s.Db.Queries.GetTokenByToken(r.Context(), token)
+			if err != nil {
+				s.Log(UnauthorizedEvent, fmt.Sprintf("invalid token '%s' provided to get env: %s", authValue, err.Error()), r)
+				h.ResUnauthorized(w)
+				return
+			}
+		} else {
+			s.Log(UnauthorizedEvent, fmt.Sprintf("invalid token type '%s' provided to get env. Supported token types: %s", authValue, strings.Join(getSupportedTokenTypes(), ", ")), r)
+			h.ResUnauthorized(w)
+			return
+		}
+		permissions, err := s.Db.Queries.ListPermissionsByTokenId(r.Context(), tkn.ID)
+		if err != nil {
+			s.Log(ErrorEvent, fmt.Sprintf("failed to list permissions for token %s: %s", tkn.ID, err.Error()), r)
+			h.ResErr(w, err)
+			return
+		}
+		secrets, err := s.Db.Queries.ListSecrets(r.Context())
+		if err != nil {
+			s.Log(ErrorEvent, fmt.Sprintf("(before matching) couldn't retrieve secrets for token %s: %s", tkn.ID, err.Error()), r)
+			h.ResErr(w, err)
+			return
+		}
+		var allowedSecrets []sqlc.Secret
+		for _, secret := range secrets {
+			for _, permission := range permissions {
+				if PatternMatches(secret.Key, permission.SecretKeyPattern) {
+					allowedSecrets = append(allowedSecrets, secret)
+					break
+				}
+			}
+		}
+		s.Log(GetFullEnvEvent, fmt.Sprintf("token %s retrieved %d secrets as env", tkn.ID, len(allowedSecrets)), r)
+		h.ResSuccess(w, allowedSecrets)
+	})
 }

@@ -17,6 +17,7 @@ const (
 	IngestEvent           LogEvent = "ingest"
 	DeleteEvent           LogEvent = "delete"
 	GetSecretEvent        LogEvent = "get-secret"
+	GetFullEnvEvent       LogEvent = "get-full-env"
 	UpdateSecretEvent     LogEvent = "update-secret"
 	UpdateTokenEvent      LogEvent = "update-token"
 	GetUsersEvent         LogEvent = "get-users"

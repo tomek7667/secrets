@@ -26,4 +26,10 @@ func main() {
 		"secret", secret,
 		"err", err,
 	)
+	allSecrets, err := secretsClient.ListSecrets()
+	slog.Info(
+		"result",
+		"allSecrets", allSecrets,
+		"err", err,
+	)
 }
