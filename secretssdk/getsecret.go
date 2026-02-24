@@ -57,3 +57,11 @@ func (c *Client) GetSecretWithCtx(key string, ctx context.Context) (*Secret, err
 func (c *Client) GetSecret(key string) (*Secret, error) {
 	return c.GetSecretWithCtx(key, context.Background())
 }
+
+func (c *Client) MustGetSecret(key string) *Secret {
+	s, err := c.GetSecret(key)
+	if err != nil {
+		panic(err)
+	}
+	return s
+}
