@@ -225,6 +225,7 @@ export function SecretsPanel({ showToast }: SecretsPanelProps) {
 					<Input
 						id="create-value"
 						label="Value"
+						multiline
 						value={createValue}
 						onChange={(e) => setCreateValue(e.target.value)}
 						placeholder="Secret value"
@@ -256,6 +257,7 @@ export function SecretsPanel({ showToast }: SecretsPanelProps) {
 					<Input
 						id="edit-value"
 						label="Value"
+						multiline
 						value={editValue}
 						onChange={(e) => setEditValue(e.target.value)}
 						placeholder="New value"
