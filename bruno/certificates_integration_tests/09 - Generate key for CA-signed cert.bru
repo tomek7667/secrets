@@ -1,0 +1,35 @@
+meta {
+  name: 09 - Generate key for CA-signed cert
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{burl}}/api/certificates/generate-keypair
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{admin_token}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "test-ca-signed-key",
+    "algorithm": "RSA",
+    "key_size": 2048
+  }
+}
+
+script:post-response {
+  if (res.body.data && res.body.data.private_key) {
+    bru.setEnvVar("ca_signed_key_name", res.body.data.private_key.name);
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+}

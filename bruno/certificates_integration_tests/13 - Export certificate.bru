@@ -1,0 +1,28 @@
+meta {
+  name: 13 - Export certificate
+  type: http
+  seq: 13
+}
+
+get {
+  url: {{burl}}/api/certificates/test-self-signed-cert/export
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{admin_token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data.name: eq test-self-signed-cert
+}
+
+tests {
+  test("Certificate export should succeed", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().data.pem_data).to.contain("CERTIFICATE");
+  });
+}

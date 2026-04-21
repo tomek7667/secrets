@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "certificates_integration_tests",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

@@ -1,0 +1,28 @@
+meta {
+  name: 05 - List all certificates
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{burl}}/api/certificates
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{admin_token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+}
+
+tests {
+  test("Should list all certificates", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().data).to.be.an('array');
+    expect(res.getBody().data.length).to.be.at.least(6);
+  });
+}

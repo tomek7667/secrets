@@ -8,6 +8,17 @@ import (
 	"time"
 )
 
+type Certificate struct {
+	ID        string     `db:"id" json:"id"`
+	CreatedAt *time.Time `db:"created_at" json:"created_at"`
+	Name      string     `db:"name" json:"name"`
+	CertType  string     `db:"cert_type" json:"cert_type"`
+	Algorithm string     `db:"algorithm" json:"algorithm"`
+	KeySize   *int64     `db:"key_size" json:"key_size"`
+	PemData   string     `db:"pem_data" json:"pem_data"`
+	Metadata  *string    `db:"metadata" json:"metadata"`
+}
+
 type Log struct {
 	ID           string     `db:"id" json:"id"`
 	CreatedAt    *time.Time `db:"created_at" json:"created_at"`

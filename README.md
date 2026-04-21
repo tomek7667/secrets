@@ -11,29 +11,12 @@ Self-hosted secrets management with web UI and REST API.
 - Multi-user with JWT authentication
 - API tokens with pattern-based permissions
 - Audit logging
+- Certificate & key management
 
 ## Screenshots
 
-![Login](docs/screenshots/01-login.png)
-*Clean login interface with dark mode*
-
 ![Secrets Dashboard](docs/screenshots/02-secrets-dashboard.png)
-*Main dashboard showing secrets management*
-
-![Secret Revealed](docs/screenshots/03-secret-revealed.png)
-*Viewing a secret value with one click*
-
-![Users Panel](docs/screenshots/04-users-panel.png)
-*User management interface*
-
-![Tokens Panel](docs/screenshots/05-tokens-panel.png)
-*API token management*
-
-![Permissions Panel](docs/screenshots/06-permissions-panel.png)
-*Permission configuration for tokens*
-
-![Login with Cloudflare Turnstile](docs/screenshots/07-login-with-captcha.png)
-*Login page with Cloudflare Turnstile captcha enabled*
+![Permissions](docs/screenshots/06-permissions.png)
 
 ## Installation
 
@@ -127,9 +110,10 @@ Then use `Authorization: Bearer <jwt>` for:
 | POST                | `/api/secrets`      | Create secret      |
 | PUT                 | `/api/secrets?key=` | Update secret      |
 | DELETE              | `/api/secrets?key=` | Delete secret      |
-| GET/POST/PUT/DELETE | `/api/users`        | Manage users       |
-| GET/POST/PUT/DELETE | `/api/tokens`       | Manage tokens      |
-| GET/POST/PUT/DELETE | `/api/permissions`  | Manage permissions |
+| GET/POST/PUT/DELETE | `/api/users`        | Manage users           |
+| GET/POST/PUT/DELETE | `/api/tokens`       | Manage tokens          |
+| GET/POST/PUT/DELETE | `/api/permissions`  | Manage permissions     |
+| GET/POST/DELETE     | `/api/certificates` | Manage certificates    |
 
 ## Pattern Matching
 
@@ -138,6 +122,10 @@ Permissions use wildcard patterns:
 - `*` — all secrets
 - `aws/*` — secrets starting with `aws/`
 - `exact-key` — exact match only
+
+## Certificate Management
+
+The secrets manager supports PKI operations for RSA, ECDSA, and ED25519 keys. Generate key pairs, create self-signed or CA-signed X.509 certificates, import/export PEM format, and verify certificate chains via `/api/certificates` endpoints. Private keys are automatically named with `-private` suffix.
 
 ## Development
 
@@ -156,5 +144,9 @@ cd web && yarn dev    # Runs on localhost:5173, proxies API to :7770
 Integration tests (requires [Bruno CLI](https://www.usebruno.com/)):
 
 ```bash
+# Run all test collections
 cd bruno/auth_integration_tests && bru run --env local
+cd bruno/secrets_integration_tests && bru run --env local
+cd bruno/users_tokens_integration_tests && bru run --env local
+cd bruno/certificates_integration_tests && bru run --env local
 ```

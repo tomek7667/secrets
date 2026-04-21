@@ -1,0 +1,36 @@
+meta {
+  name: 11 - Verify self-signed certificate
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{burl}}/api/certificates/verify
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{admin_token}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "certificate_name": "test-self-signed-cert"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data.self_signed: eq true
+}
+
+tests {
+  test("Self-signed certificate verification should succeed", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().data.self_signed).to.be.true;
+    expect(res.getBody().data.subject).to.contain("test.example.com");
+  });
+}

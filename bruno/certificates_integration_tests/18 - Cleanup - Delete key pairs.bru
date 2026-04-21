@@ -1,0 +1,20 @@
+meta {
+  name: 18 - Cleanup - Delete key pairs
+  type: http
+  seq: 18
+}
+
+delete {
+  url: {{burl}}/api/certificates/test-rsa-private
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{admin_token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+}

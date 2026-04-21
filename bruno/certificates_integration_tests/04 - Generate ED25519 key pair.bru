@@ -1,0 +1,43 @@
+meta {
+  name: 04 - Generate ED25519 key pair
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{burl}}/api/certificates/generate-keypair
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{admin_token}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "test-ed25519",
+    "algorithm": "ED25519"
+  }
+}
+
+script:post-response {
+  if (res.body.data && res.body.data.private_key) {
+    bru.setEnvVar("ed25519_private_key_name", res.body.data.private_key.name);
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data.private_key.name: eq test-ed25519-private
+  res.body.data.private_key.algorithm: eq ED25519
+}
+
+tests {
+  test("ED25519 key pair generation should succeed", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().data.private_key.pem_data).to.contain("PRIVATE KEY");
+  });
+}

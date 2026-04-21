@@ -1,0 +1,29 @@
+meta {
+  name: 14 - Get specific certificate
+  type: http
+  seq: 14
+}
+
+get {
+  url: {{burl}}/api/certificates/test-rsa-private
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{admin_token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data.name: eq test-rsa-private
+  res.body.data.algorithm: eq RSA
+}
+
+tests {
+  test("Get specific certificate should succeed", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().data.cert_type).to.equal("private_key");
+  });
+}
